@@ -1,0 +1,9 @@
+{
+  "editor.tabSize": 2,
+  "window.zoomLevel": -1,
+  "prettier.semi": false,
+  "editor.formatOnSave": true,
+  "[go]": {
+    "editor.defaultFormatter": "golang.go"
+  }
+}
