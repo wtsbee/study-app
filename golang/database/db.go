@@ -1,4 +1,4 @@
-package db
+package database
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ import (
 func NewDB() *gorm.DB {
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalln("NewDB 環境変数読込みエラー: ", err)
+		log.Println("database NewDB 環境変数読込みエラー: ", err)
 	}
 
 	USER := os.Getenv("MYSQL_ROOT_USER")
@@ -26,22 +26,19 @@ func NewDB() *gorm.DB {
 	dsn := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME + "?charset=utf8&parseTime=true&loc=Asia%2FTokyo"
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
-		log.Fatalln("NewDB DB接続エラー: ", err)
+		log.Println("database NewDB DB接続エラー: ", err)
 	}
-	log.Println("NewDB DB接続完了")
+	log.Println("database NewDB DB接続完了")
 	return db
 }
 
 func CloseDB(db *gorm.DB) {
 	sqlDB, _ := db.DB()
 	if err := sqlDB.Close(); err != nil {
-		log.Fatalln("CloseDB DBクローズエラー: ", err)
+		log.Println("database CloseDB DBクローズエラー: ", err)
 	}
 }
 
-func Migrate() {
-	dbConn := NewDB()
-	defer log.Println("Successfully Migrated")
-	defer CloseDB(dbConn)
-	dbConn.AutoMigrate(&model.User{})
+func Migrate(db *gorm.DB) {
+	db.AutoMigrate(&model.User{})
 }
