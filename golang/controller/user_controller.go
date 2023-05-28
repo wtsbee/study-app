@@ -30,12 +30,12 @@ func (uc *userController) SignUp(c echo.Context) error {
 	user := model.User{}
 	if err := c.Bind(&user); err != nil {
 		log.Println("controller SignUp リクエストデータ取得エラー: ", err)
-		return c.JSON(http.StatusBadRequest, err)
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
 	}
 	userRes, err := uc.uu.SignUp(user)
 	if err != nil {
 		log.Println("controller SignUp サインアップエラー: ", err)
-		return c.JSON(http.StatusInternalServerError, err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
 	log.Println("controller SignUp サインアップ成功")
 	return c.JSON(http.StatusCreated, userRes)
@@ -45,7 +45,7 @@ func (uc *userController) LogIn(c echo.Context) error {
 	user := model.User{}
 	if err := c.Bind(&user); err != nil {
 		log.Println("controller LogIn リクエストデータ取得エラー: ", err)
-		return c.JSON(http.StatusBadRequest, err)
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
 	}
 	tokenString, err := uc.uu.Login(user)
 	if err != nil {
