@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import axios from "axios";
-import Home from "@/components/pages/Home/Home";
-import { Auth } from "@/components/pages/Auth";
+import Home from "@/components/pages/Home";
+import Auth from "@/components/pages/Auth";
 import { CsrfToken } from "@/types";
 
 function App() {

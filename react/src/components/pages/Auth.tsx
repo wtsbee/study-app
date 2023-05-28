@@ -2,7 +2,7 @@ import { useState, FormEvent } from "react";
 import { CheckBadgeIcon, ArrowPathIcon } from "@heroicons/react/24/solid";
 import { useMutateAuth } from "@/hooks/useMutateAuth";
 
-export const Auth = () => {
+const Auth = () => {
   const [email, setEmail] = useState("");
   const [pw, setPw] = useState("");
   const [isLogin, setIsLogin] = useState(true);
@@ -75,3 +75,5 @@ export const Auth = () => {
     </div>
   );
 };
+
+export default Auth;
