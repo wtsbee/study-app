@@ -1,9 +1,8 @@
 import { useEffect } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import axios from "axios";
-import Header from "@/components/header/Header";
 import Home from "@/components/pages/Home/Home";
-import { Auth } from "@/components/auth/Auth";
+import { Auth } from "@/components/pages/Auth";
 import { CsrfToken } from "@/types";
 
 function App() {
@@ -20,7 +19,6 @@ function App() {
   }, []);
   return (
     <div className="App">
-      <Header></Header>
       <div className="flex min-h-screen">
         <div className="flex-grow bg-blue-100 invisible md:visible"></div>
         <div className="main w-full md:w-3/5">
