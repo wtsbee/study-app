@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import axios from "axios";
 import Home from "@/components/pages/Home";
 import Auth from "@/components/pages/Auth";
+import Board from "@/components/pages/Board/Board";
 import { CsrfToken } from "@/types";
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Auth />} />
               <Route path="/home" element={<Home />} />
+              <Route path="/board" element={<Board />} />
             </Routes>
           </BrowserRouter>
         </div>
