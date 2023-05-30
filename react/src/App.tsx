@@ -22,7 +22,7 @@ function App() {
     <div className="App">
       <div className="flex min-h-screen">
         <div className="flex-grow bg-blue-100 invisible md:visible"></div>
-        <div className="main w-full md:w-3/5">
+        <div className="main w-full min-h-full">
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Auth />} />

@@ -6,9 +6,9 @@ const Header = () => {
     await logoutMutation.mutateAsync();
   };
   return (
-    <header className="bg-blue-700 z-0">
-      <div className="mx-4 md:mx-12 py-2">
-        <div className="container flex items-center justify-between text-white font-bold">
+    <header className="bg-blue-700 z-0 w-100%">
+      <div className="mx-4 md:mx-12 py-2 h-12 md:h-14">
+        <div className="flex items-center justify-between text-white font-bold">
           <div className="text-2xl md:text-4xl">StudyApp</div>
           <button className="flex">
             <svg
