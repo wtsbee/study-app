@@ -81,9 +81,14 @@ const Task = () => {
     <>
       <Header></Header>
       <div className="mx-1 overflow-auto min-h-[calc(100%_-_48px) md:min-h-[calc(100%_-_56px)]">
-        <h1 className="ml-2 mt-2 font-bold">タスク管理</h1>
+        <div className="ml-2">
+          <h1 className="my-2 font-bold text-xl">タスク管理</h1>
+          <button className="mb-1 py-2 px-4 rounded text-white bg-orange-500 font-bold">
+            リストを追加
+          </button>
+        </div>
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="trello">
+          <div className="trello ml-1">
             <Droppable droppableId="board" direction="horizontal" type="board">
               {(provided) => (
                 <div
