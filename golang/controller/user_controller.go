@@ -11,6 +11,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// インターフェース
 type IUserController interface {
 	SignUp(c echo.Context) error
 	LogIn(c echo.Context) error
@@ -22,6 +23,7 @@ type userController struct {
 	uu usecase.IUserUsecase
 }
 
+// コンストラクタ
 func NewUserController(uu usecase.IUserUsecase) IUserController {
 	return &userController{uu}
 }

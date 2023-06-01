@@ -5,11 +5,12 @@ import (
 	"os"
 	"study-app-api/controller"
 
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func NewRouter(uc controller.IUserController) *echo.Echo {
+func NewRouter(uc controller.IUserController, tc controller.ITaskController) *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{os.Getenv("FE_URL")},
@@ -30,5 +31,11 @@ func NewRouter(uc controller.IUserController) *echo.Echo {
 	e.POST("/login", uc.LogIn)
 	e.POST("/logout", uc.LogOut)
 	e.GET("/csrf", uc.CsrfToken)
+	t := e.Group("/tasks")
+	t.Use(echojwt.WithConfig(echojwt.Config{
+		SigningKey:  []byte(os.Getenv("SECRET_KEY")),
+		TokenLookup: "cookie:token",
+	}))
+	t.GET("", tc.GetOwnAllTasks)
 	return e
 }
