@@ -85,7 +85,7 @@ func (uc *userController) LogOut(c echo.Context) error {
 
 func (uc *userController) CsrfToken(c echo.Context) error {
 	token := c.Get("csrf").(string)
-	log.Println("controller CsrfToken CSRTトークン取得成功")
+	log.Println("controller CsrfToken CSRFトークン取得成功")
 	return c.JSON(http.StatusOK, echo.Map{
 		"csrf_token": token,
 	})

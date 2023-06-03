@@ -40,5 +40,5 @@ func CloseDB(db *gorm.DB) {
 }
 
 func Migrate(db *gorm.DB) {
-	db.AutoMigrate(&model.User{}, &model.Task{})
+	db.AutoMigrate(&model.User{}, &model.Task{}, &model.TaskList{})
 }

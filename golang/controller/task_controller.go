@@ -32,6 +32,6 @@ func (tc *taskController) GetOwnAllTasks(c echo.Context) error {
 		log.Println("controller GetOwnAllTasks タスク一覧取得エラー: ", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
-	log.Println("controller GetOwnAllTasks : タスク一覧取得成功", err)
+	log.Println("controller GetOwnAllTasks : タスク一覧取得成功")
 	return c.JSON(http.StatusOK, tasksRes)
 }
