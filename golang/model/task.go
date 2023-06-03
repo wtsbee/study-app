@@ -18,3 +18,11 @@ type TaskResponse struct {
 	Rank  uint   `json:"rank"`
 	Title string `json:"title"`
 }
+
+type TaskAndTaskListResponse struct {
+	TaskListRank uint
+	TaskListName string
+	TaskRank     uint
+	TaskTitle    string
+	UserId       uint
+}

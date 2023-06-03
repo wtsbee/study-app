@@ -20,9 +20,28 @@ func NewTaskUsecase(tr repository.ITaskRepository) ITaskUsecase {
 }
 
 func (tu *taskUsecase) GetOwnAllTasks(userId uint) ([]model.TaskListResponse, error) {
-	tasks := []model.TaskListResponse{}
-	if err := tu.tr.GetOwnAllTasks(&tasks, userId); err != nil {
+	ttl := []model.TaskAndTaskListResponse{}
+	if err := tu.tr.GetOwnAllTasks(&ttl, userId); err != nil {
 		return nil, err
+	}
+
+	tasks := []model.TaskListResponse{}
+	arr := []model.TaskResponse{}
+	for i, v := range ttl {
+		taskRes := model.TaskResponse{
+			Rank:  v.TaskRank,
+			Title: v.TaskTitle,
+		}
+		arr = append(arr, taskRes)
+		if i+1 == len(ttl) || ttl[i].TaskListRank != ttl[i+1].TaskListRank {
+			taskListRes := model.TaskListResponse{
+				Rank:  v.TaskListRank,
+				Name:  v.TaskListName,
+				Tasks: arr,
+			}
+			tasks = append(tasks, taskListRes)
+			arr = nil
+		}
 	}
 	return tasks, nil
 }
