@@ -11,7 +11,7 @@ type TaskList struct {
 }
 
 type TaskListResponse struct {
-	Rank  uint           `json:"rank"`
+	ID    uint           `json:"id"`
 	Name  string         `json:"name"`
 	Tasks []TaskResponse `json:"tasks"`
 }

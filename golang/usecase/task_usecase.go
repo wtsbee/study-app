@@ -29,13 +29,13 @@ func (tu *taskUsecase) GetOwnAllTasks(userId uint) ([]model.TaskListResponse, er
 	arr := []model.TaskResponse{}
 	for i, v := range ttl {
 		taskRes := model.TaskResponse{
-			Rank:  v.TaskRank,
+			ID:    v.TaskId,
 			Title: v.TaskTitle,
 		}
 		arr = append(arr, taskRes)
 		if i+1 == len(ttl) || ttl[i].TaskListRank != ttl[i+1].TaskListRank {
 			taskListRes := model.TaskListResponse{
-				Rank:  v.TaskListRank,
+				ID:    v.TaskListId,
 				Name:  v.TaskListName,
 				Tasks: arr,
 			}

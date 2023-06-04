@@ -11,18 +11,19 @@ type Task struct {
 	UserId     uint      `json:"user_id" gorm:"not null"`
 	TaskList   TaskList  `json:"task_list" gorm:"foreignKey:TaskListId; constraint:OnDelete:CASCADE"`
 	TaskListId uint      `json:"task_list_id" gorm:"not null"`
-	Rank       uint      `json:"rank" gorm:"unique"`
+	Rank       uint      `json:"rank"`
 }
 
 type TaskResponse struct {
-	Rank  uint   `json:"rank"`
+	ID    uint   `json:"id"`
 	Title string `json:"title"`
 }
 
 type TaskAndTaskListResponse struct {
+	TaskListId   uint
 	TaskListRank uint
 	TaskListName string
-	TaskRank     uint
+	TaskId       uint
 	TaskTitle    string
 	UserId       uint
 }
