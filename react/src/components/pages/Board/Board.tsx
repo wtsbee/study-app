@@ -5,24 +5,28 @@ import {
   DropResult,
 } from "react-beautiful-dnd";
 import dummyData from "./dummyData";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import BoardCard from "./BoardCard";
 import Header from "@/components/header/Header";
+import { useQueryTasks } from "@/hooks/useQueryTasks";
+import { Task, TaskList } from "@/types";
 
-interface TaskData {
-  id: string;
-  title: string;
-}
+const Board = () => {
+  const { data: resData, isLoading, isError } = useQueryTasks();
+  const [data, setData] = useState<TaskList[]>([]);
 
-interface SectionData {
-  id: string;
-  title: string;
-  tasks: TaskData[];
-}
+  useEffect(() => {
+    if (resData) {
+      setData(resData);
+    }
+  }, [resData]);
 
-const Task = () => {
-  const [data, setData] = useState<SectionData[]>(dummyData);
-
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+  if (isError) {
+    return <div>Error occurred</div>;
+  }
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
     const { source, destination } = result;
@@ -39,17 +43,19 @@ const Task = () => {
     } else if (source.droppableId !== destination.droppableId) {
       // 動かし始めたcolumnが違うcolumnに移動する場合
       // 動かし始めたcolumnの配列の番号を取得
-      const sourceColIndex = data.findIndex((e) => e.id === source.droppableId);
+      const sourceColIndex = data.findIndex(
+        (e) => e.id.toString() === source.droppableId
+      );
       // 動かし終わったcolumnの配列の番号を取得
       const destinationColIndex = data.findIndex(
-        (e) => e.id === destination.droppableId
+        (e) => e.id.toString() === destination.droppableId
       );
 
-      const sourseCol = data[sourceColIndex];
+      const sourceCol = data[sourceColIndex];
       const destinationCol = data[destinationColIndex];
 
       // 動かし始めたタスクに属していたカラムの中のタスクを全て取得
-      const sourceTask = [...sourseCol.tasks];
+      const sourceTask = [...sourceCol.tasks];
       // 動かし終わったタスクに属していたカラムの中のタスクを全て取得
       const destinationTask = [...destinationCol.tasks];
 
@@ -64,9 +70,11 @@ const Task = () => {
       setData(data);
     } else {
       // 同じカラム内でタスクを入れ替える場合
-      const sourceColIndex = data.findIndex((e) => e.id === source.droppableId);
-      const sourseCol = data[sourceColIndex];
-      const sourceTask = [...sourseCol.tasks];
+      const sourceColIndex = data.findIndex(
+        (e) => e.id.toString() === source.droppableId
+      );
+      const sourceCol = data[sourceColIndex];
+      const sourceTask = [...sourceCol.tasks];
 
       const [removed] = sourceTask.splice(source.index, 1);
       sourceTask.splice(destination.index, 0, removed);
@@ -96,11 +104,11 @@ const Task = () => {
                   ref={provided.innerRef}
                   {...provided.droppableProps}
                 >
-                  {data.map((section, index) => (
+                  {data?.map((section, index) => (
                     <Draggable
-                      draggableId={section.title}
+                      draggableId={`${section.id.toString()} + ${section.name}`}
                       index={index}
-                      key={section.title}
+                      key={section.id}
                     >
                       {(provided) => (
                         <div
@@ -108,7 +116,10 @@ const Task = () => {
                           {...provided.draggableProps}
                           {...provided.dragHandleProps}
                         >
-                          <Droppable key={section.id} droppableId={section.id}>
+                          <Droppable
+                            key={section.id}
+                            droppableId={section.id.toString()}
+                          >
                             {(provided) => (
                               <div
                                 className="trello-section w-96 bg-pink-400 m-1 p-2 rounded"
@@ -116,12 +127,12 @@ const Task = () => {
                                 {...provided.droppableProps}
                               >
                                 <div className="trello-section-title font-bold">
-                                  {section.title}
+                                  {section.name}
                                 </div>
                                 <div className="trello-section-content">
-                                  {section.tasks.map((task, index) => (
+                                  {section.tasks?.map((task, index) => (
                                     <Draggable
-                                      draggableId={task.id}
+                                      draggableId={task.id.toString()}
                                       index={index}
                                       key={task.id}
                                     >
@@ -162,4 +173,4 @@ const Task = () => {
   );
 };
 
-export default Task;
+export default Board;
