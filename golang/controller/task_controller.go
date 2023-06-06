@@ -3,6 +3,7 @@ package controller
 import (
 	"log"
 	"net/http"
+	"study-app-api/model"
 	"study-app-api/usecase"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -12,6 +13,7 @@ import (
 // インターフェース
 type ITaskController interface {
 	GetOwnAllTasks(c echo.Context) error
+	UpdateOwnAllTasks(c echo.Context) error
 }
 
 type taskController struct {
@@ -34,4 +36,14 @@ func (tc *taskController) GetOwnAllTasks(c echo.Context) error {
 	}
 	log.Println("controller GetOwnAllTasks : タスク一覧取得成功")
 	return c.JSON(http.StatusOK, tasksRes)
+}
+
+func (tc *taskController) UpdateOwnAllTasks(c echo.Context) error {
+	taskList := []model.TaskListResponse{}
+	if err := c.Bind(&taskList); err != nil {
+		log.Println("controller UpdateOwnAllTasks リクエストデータ取得エラー: ", err)
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
+	}
+	tc.tu.UpdateOwnAllTasks(taskList)
+	return nil
 }

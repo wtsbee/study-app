@@ -37,5 +37,6 @@ func NewRouter(uc controller.IUserController, tc controller.ITaskController) *ec
 		TokenLookup: "cookie:token",
 	}))
 	t.GET("", tc.GetOwnAllTasks)
+	t.POST("", tc.UpdateOwnAllTasks)
 	return e
 }

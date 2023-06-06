@@ -5,7 +5,7 @@ import "time"
 type TaskList struct {
 	ID        uint      `json:"id" gorm:"primaryKey"`
 	Name      string    `json:"name" gorm:"not null"`
-	Rank      uint      `json:"rank" gorm:"unique"`
+	Rank      uint      `json:"rank"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
 }
