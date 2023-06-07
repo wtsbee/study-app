@@ -29,11 +29,14 @@ func (tu *taskUsecase) GetOwnAllTasks(userId uint) ([]model.TaskListResponse, er
 	tasks := []model.TaskListResponse{}
 	arr := []model.TaskResponse{}
 	for i, v := range ttl {
-		taskRes := model.TaskResponse{
-			ID:    v.TaskId,
-			Title: v.TaskTitle,
+		taskRes := model.TaskResponse{}
+		if v.TaskId != 0 {
+			taskRes = model.TaskResponse{
+				ID:    v.TaskId,
+				Title: v.TaskTitle,
+			}
+			arr = append(arr, taskRes)
 		}
-		arr = append(arr, taskRes)
 		if i+1 == len(ttl) || ttl[i].TaskListRank != ttl[i+1].TaskListRank {
 			taskListRes := model.TaskListResponse{
 				ID:    v.TaskListId,
