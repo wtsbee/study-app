@@ -4,16 +4,17 @@ import {
   Droppable,
   DropResult,
 } from "react-beautiful-dnd";
-import dummyData from "./dummyData";
 import { useEffect, useState } from "react";
 import BoardCard from "./BoardCard";
 import Header from "@/components/header/Header";
 import { useQueryTasks } from "@/hooks/useQueryTasks";
+import { useMutateTask } from "@/hooks/useMutateTask";
 import { Task, TaskList } from "@/types";
 
 const Board = () => {
   const { data: resData, isLoading, isError } = useQueryTasks();
   const [data, setData] = useState<TaskList[]>([]);
+  const { updateTaskMutation } = useMutateTask();
 
   useEffect(() => {
     if (resData) {
@@ -31,8 +32,8 @@ const Board = () => {
     if (!result.destination) return;
     const { source, destination } = result;
 
+    const newData = [...data];
     if (source.droppableId == "board") {
-      const newData = [...data];
       // 要素の移動
       const startIndex = source.index;
       const endIndex = destination.index;
@@ -43,19 +44,23 @@ const Board = () => {
     } else if (source.droppableId !== destination.droppableId) {
       // 動かし始めたcolumnが違うcolumnに移動する場合
       // 動かし始めたcolumnの配列の番号を取得
-      const sourceColIndex = data.findIndex(
+      const sourceColIndex = newData.findIndex(
         (e) => e.id.toString() === source.droppableId
       );
       // 動かし終わったcolumnの配列の番号を取得
-      const destinationColIndex = data.findIndex(
+      const destinationColIndex = newData.findIndex(
         (e) => e.id.toString() === destination.droppableId
       );
 
-      const sourceCol = data[sourceColIndex];
-      const destinationCol = data[destinationColIndex];
+      const sourceCol = newData[sourceColIndex];
+      const destinationCol = newData[destinationColIndex];
 
       // 動かし始めたタスクに属していたカラムの中のタスクを全て取得
       const sourceTask = [...sourceCol.tasks];
+      // TODO:2番目以降のリストの箱が空の場合、tasksが空配列ではなくnullになるため要見直し
+      if (destinationCol.tasks == null) {
+        destinationCol.tasks = [];
+      }
       // 動かし終わったタスクに属していたカラムの中のタスクを全て取得
       const destinationTask = [...destinationCol.tasks];
 
@@ -64,25 +69,26 @@ const Board = () => {
       // 後のカラムに追加
       destinationTask.splice(destination.index, 0, removed);
 
-      data[sourceColIndex].tasks = sourceTask;
-      data[destinationColIndex].tasks = destinationTask;
+      newData[sourceColIndex].tasks = sourceTask;
+      newData[destinationColIndex].tasks = destinationTask;
 
-      setData(data);
+      setData(newData);
     } else {
       // 同じカラム内でタスクを入れ替える場合
-      const sourceColIndex = data.findIndex(
+      const sourceColIndex = newData.findIndex(
         (e) => e.id.toString() === source.droppableId
       );
-      const sourceCol = data[sourceColIndex];
+      const sourceCol = newData[sourceColIndex];
       const sourceTask = [...sourceCol.tasks];
 
       const [removed] = sourceTask.splice(source.index, 1);
       sourceTask.splice(destination.index, 0, removed);
 
-      data[sourceColIndex].tasks = sourceTask;
+      newData[sourceColIndex].tasks = sourceTask;
 
-      setData(data);
+      setData(newData);
     }
+    updateTaskMutation.mutate(newData);
   };
 
   return (
