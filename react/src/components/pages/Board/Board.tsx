@@ -4,7 +4,7 @@ import {
   Droppable,
   DropResult,
 } from "react-beautiful-dnd";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import BoardCard from "./BoardCard";
 import Header from "@/components/header/Header";
 import { useQueryTasks } from "@/hooks/useQueryTasks";
@@ -15,6 +15,36 @@ const Board = () => {
   const { data: resData, isLoading, isError } = useQueryTasks();
   const [data, setData] = useState<TaskList[]>([]);
   const { updateTaskMutation } = useMutateTask();
+
+  const socketRef = useRef<WebSocket>();
+
+  useEffect(() => {
+    socketRef.current = new WebSocket(
+      `${import.meta.env.VITE_BACKEND_WEBSOCKET_URL}/tasks/ws`
+    );
+
+    socketRef.current.onopen = () => {
+      console.log("ws接続");
+    };
+
+    socketRef.current.onclose = () => {
+      console.log("ws切断");
+    };
+
+    // メッセージ受信時の処理
+    socketRef.current.onmessage = (event) => {
+      console.log("ws受信");
+      setData(JSON.parse(event.data));
+    };
+
+    // コンポーネントのアンマウント時にWebSocket接続をクローズ
+    return () => {
+      if (socketRef.current == null) {
+        return;
+      }
+      socketRef.current.close();
+    };
+  }, []);
 
   useEffect(() => {
     if (resData) {
@@ -40,7 +70,7 @@ const Board = () => {
       const element = newData.splice(startIndex, 1)[0];
       newData.splice(endIndex, 0, element);
 
-      setData(newData);
+      // setData(newData);
     } else if (source.droppableId !== destination.droppableId) {
       // 動かし始めたcolumnが違うcolumnに移動する場合
       // 動かし始めたcolumnの配列の番号を取得
@@ -72,7 +102,7 @@ const Board = () => {
       newData[sourceColIndex].tasks = sourceTask;
       newData[destinationColIndex].tasks = destinationTask;
 
-      setData(newData);
+      // setData(newData);
     } else {
       // 同じカラム内でタスクを入れ替える場合
       const sourceColIndex = newData.findIndex(
@@ -86,9 +116,10 @@ const Board = () => {
 
       newData[sourceColIndex].tasks = sourceTask;
 
-      setData(newData);
+      // setData(newData);
     }
     updateTaskMutation.mutate(newData);
+    socketRef.current?.send(JSON.stringify(newData));
   };
 
   return (
