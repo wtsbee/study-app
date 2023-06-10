@@ -39,6 +39,7 @@ services:
     command: npm run dev
     environment:
       VITE_BACKEND_URL: http://localhost:8080
+      VITE_BACKEND_WEBSOCKET_URL: ws://localhost:8080
     volumes:
       - ./react:/app
     ports:
