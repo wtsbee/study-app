@@ -7,6 +7,7 @@ import (
 	"study-app-api/usecase"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 )
 
@@ -14,11 +15,21 @@ import (
 type ITaskController interface {
 	GetOwnAllTasks(c echo.Context) error
 	UpdateOwnAllTasks(c echo.Context) error
+	WebSocketHandler(c echo.Context) error
 }
 
 type taskController struct {
 	tu usecase.ITaskUsecase
 }
+
+var (
+	upgrader = websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+	clients = make(map[*websocket.Conn]bool)
+)
 
 func NewTaskController(ut usecase.ITaskUsecase) ITaskController {
 	return &taskController{ut}
@@ -45,5 +56,36 @@ func (tc *taskController) UpdateOwnAllTasks(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
 	}
 	tc.tu.UpdateOwnAllTasks(taskList)
+	return nil
+}
+
+func (tc *taskController) WebSocketHandler(c echo.Context) error {
+	conn, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
+	if err != nil {
+		log.Println("websocketHandler Upgrade error:", err)
+		return err
+	}
+	defer conn.Close()
+
+	clients[conn] = true
+
+	for {
+		// クライアントからメッセージを受信
+		messageType, message, err := conn.ReadMessage()
+		if err != nil {
+			log.Println("websocketHandler Read error:", err)
+			break
+		}
+
+		// 受信したメッセージを全てのクライアントに送信
+		for client := range clients {
+			err = client.WriteMessage(messageType, message)
+			if err != nil {
+				log.Println("websocketHandler Write error:", err)
+				client.Close()
+				delete(clients, client)
+			}
+		}
+	}
 	return nil
 }
