@@ -13,10 +13,29 @@ import { Task, TaskList } from "@/types";
 
 const Board = () => {
   const { data: resData, isLoading, isError } = useQueryTasks();
-  const [data, setData] = useState<TaskList[]>([]);
   const { updateTaskMutation } = useMutateTask();
+  const [data, setData] = useState<TaskList[]>([]);
+  const [isEdit, setIsEdit] = useState(false);
+  const [input, setInput] = useState("");
 
   const socketRef = useRef<WebSocket>();
+
+  const openList = () => {
+    setIsEdit(true);
+  };
+
+  const closeList = () => {
+    setIsEdit(false);
+  };
+
+  const inputText = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInput(e.target.value);
+  };
+
+  const addList = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    updateTaskMutation.mutate([...data, { name: input, tasks: [] }]);
+    setInput("");
+  };
 
   useEffect(() => {
     socketRef.current = new WebSocket(
@@ -75,11 +94,11 @@ const Board = () => {
       // 動かし始めたcolumnが違うcolumnに移動する場合
       // 動かし始めたcolumnの配列の番号を取得
       const sourceColIndex = newData.findIndex(
-        (e) => e.id.toString() === source.droppableId
+        (e) => e.id?.toString() === source.droppableId
       );
       // 動かし終わったcolumnの配列の番号を取得
       const destinationColIndex = newData.findIndex(
-        (e) => e.id.toString() === destination.droppableId
+        (e) => e.id?.toString() === destination.droppableId
       );
 
       const sourceCol = newData[sourceColIndex];
@@ -106,7 +125,7 @@ const Board = () => {
     } else {
       // 同じカラム内でタスクを入れ替える場合
       const sourceColIndex = newData.findIndex(
-        (e) => e.id.toString() === source.droppableId
+        (e) => e.id?.toString() === source.droppableId
       );
       const sourceCol = newData[sourceColIndex];
       const sourceTask = [...sourceCol.tasks];
@@ -128,9 +147,48 @@ const Board = () => {
       <div className="mx-1 overflow-auto min-h-[calc(100%_-_48px) md:min-h-[calc(100%_-_56px)]">
         <div className="ml-2">
           <h1 className="my-2 font-bold text-xl">タスク管理</h1>
-          <button className="mb-1 py-2 px-4 rounded text-white bg-orange-500 font-bold">
-            リストを追加
-          </button>
+          <h1>{input}</h1>
+          {isEdit ? (
+            <div className="flex flex-col w-80">
+              <input
+                onChange={inputText}
+                value={input}
+                placeholder="リスト名を入力してください"
+                className="mb-2 p-2 rounded border border-gray-500"
+              />
+              <div className="flex items-center">
+                <button
+                  onClick={addList}
+                  className="mb-1 py-2 px-4 rounded text-white bg-orange-500 font-bold"
+                >
+                  リストを追加
+                </button>
+                <div onClick={closeList} className="hover:cursor-pointer">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-6 h-6"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M6 18L18 6M6 6l12 12"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={openList}
+              className="mb-1 py-2 px-4 rounded text-white bg-orange-500 font-bold"
+            >
+              リストの新規作成
+            </button>
+          )}
         </div>
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="trello ml-1">

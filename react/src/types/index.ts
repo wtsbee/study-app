@@ -8,8 +8,7 @@ export type Credential = {
 };
 
 export type TaskList = {
-  id: number;
-  rank: number;
+  id?: number;
   name: string;
   tasks: Task[];
 };
