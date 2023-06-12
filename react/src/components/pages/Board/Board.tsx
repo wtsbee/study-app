@@ -12,7 +12,7 @@ import { useMutateTask } from "@/hooks/useMutateTask";
 import { Task, TaskList } from "@/types";
 
 const Board = () => {
-  const { data: resData, isLoading, isError } = useQueryTasks();
+  const { data: resData, isLoading, isError, refetch } = useQueryTasks();
   const { updateTaskMutation } = useMutateTask();
   const [data, setData] = useState<TaskList[]>([]);
   const [isEdit, setIsEdit] = useState(false);
@@ -32,9 +32,10 @@ const Board = () => {
     setInput(e.target.value);
   };
 
-  const addList = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    updateTaskMutation.mutate([...data, { name: input, tasks: [] }]);
+  const addList = async () => {
+    await updateTaskMutation.mutateAsync([...data, { name: input, tasks: [] }]);
     setInput("");
+    await refetch();
   };
 
   useEffect(() => {
@@ -68,6 +69,7 @@ const Board = () => {
   useEffect(() => {
     if (resData) {
       setData(resData);
+      socketRef.current?.send(JSON.stringify(resData));
     }
   }, [resData]);
 
@@ -147,7 +149,6 @@ const Board = () => {
       <div className="mx-1 overflow-auto min-h-[calc(100%_-_48px) md:min-h-[calc(100%_-_56px)]">
         <div className="ml-2">
           <h1 className="my-2 font-bold text-xl">タスク管理</h1>
-          <h1>{input}</h1>
           {isEdit ? (
             <div className="flex flex-col w-80">
               <input
