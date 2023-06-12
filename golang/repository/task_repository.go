@@ -9,7 +9,7 @@ import (
 // インターフェース
 type ITaskRepository interface {
 	GetOwnAllTasks(tasks *[]model.TaskAndTaskListResponse, userId uint) error
-	UpdateOwnAllTasks(taskList *[]model.TaskListResponse) error
+	UpdateOwnAllTasks(taskList *[]model.TaskListResponse, userId uint) error
 }
 
 type taskRepository struct {
@@ -35,13 +35,17 @@ func (tr *taskRepository) GetOwnAllTasks(ttl *[]model.TaskAndTaskListResponse, u
 	return nil
 }
 
-func (tr *taskRepository) UpdateOwnAllTasks(taskList *[]model.TaskListResponse) error {
+func (tr *taskRepository) UpdateOwnAllTasks(taskList *[]model.TaskListResponse, userId uint) error {
 	for index, value := range *taskList {
 		rank := uint(index + 1)
-		tr.db.Updates(&model.TaskList{ID: value.ID, Rank: rank})
-		for i, v := range value.Tasks {
-			rank = uint(i + 1)
-			tr.db.Updates(&model.Task{ID: v.ID, TaskListId: value.ID, Rank: rank})
+		if value.ID == 0 {
+			tr.db.Create(&model.TaskList{Name: value.Name, Rank: rank, UserId: userId})
+		} else {
+			tr.db.Updates(&model.TaskList{ID: value.ID, Rank: rank})
+			for i, v := range value.Tasks {
+				rank = uint(i + 1)
+				tr.db.Updates(&model.Task{ID: v.ID, TaskListId: value.ID, Rank: rank})
+			}
 		}
 	}
 	return nil

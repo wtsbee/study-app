@@ -50,12 +50,15 @@ func (tc *taskController) GetOwnAllTasks(c echo.Context) error {
 }
 
 func (tc *taskController) UpdateOwnAllTasks(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
 	taskList := []model.TaskListResponse{}
 	if err := c.Bind(&taskList); err != nil {
 		log.Println("controller UpdateOwnAllTasks リクエストデータ取得エラー: ", err)
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
 	}
-	tc.tu.UpdateOwnAllTasks(taskList)
+	tc.tu.UpdateOwnAllTasks(taskList, uint(userId.(float64)))
 	return nil
 }
 

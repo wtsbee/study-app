@@ -8,7 +8,7 @@ import (
 // // インターフェース
 type ITaskUsecase interface {
 	GetOwnAllTasks(userId uint) ([]model.TaskListResponse, error)
-	UpdateOwnAllTasks(taskList []model.TaskListResponse) error
+	UpdateOwnAllTasks(taskList []model.TaskListResponse, userId uint) error
 }
 
 type taskUsecase struct {
@@ -50,8 +50,8 @@ func (tu *taskUsecase) GetOwnAllTasks(userId uint) ([]model.TaskListResponse, er
 	return tasks, nil
 }
 
-func (tu *taskUsecase) UpdateOwnAllTasks(taskList []model.TaskListResponse) error {
-	if err := tu.tr.UpdateOwnAllTasks(&taskList); err != nil {
+func (tu *taskUsecase) UpdateOwnAllTasks(taskList []model.TaskListResponse, userId uint) error {
+	if err := tu.tr.UpdateOwnAllTasks(&taskList, userId); err != nil {
 		return err
 	}
 	return nil
