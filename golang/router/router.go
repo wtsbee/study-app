@@ -39,5 +39,6 @@ func NewRouter(uc controller.IUserController, tc controller.ITaskController) *ec
 	}))
 	t.GET("", tc.GetOwnAllTasks)
 	t.POST("", tc.UpdateOwnAllTasks)
+	t.DELETE("/:id", tc.DeleteTaskList)
 	return e
 }
