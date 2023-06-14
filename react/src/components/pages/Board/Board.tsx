@@ -69,7 +69,9 @@ const Board = () => {
   useEffect(() => {
     if (resData) {
       setData(resData);
-      socketRef.current?.send(JSON.stringify(resData));
+      if (socketRef.current?.readyState === 1) {
+        socketRef.current?.send(JSON.stringify(resData));
+      }
     }
   }, [resData]);
 
