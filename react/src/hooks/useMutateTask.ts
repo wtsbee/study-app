@@ -26,5 +26,23 @@ export const useMutateTask = () => {
       },
     }
   );
-  return { updateTaskMutation };
+  const deleteTaskListMutation = useMutation(
+    (id: number) =>
+      axios({
+        method: "delete",
+        url: `${import.meta.env.VITE_BACKEND_URL}/tasks/${id}`,
+        withCredentials: true,
+      }),
+    {
+      onSuccess: () => {},
+      onError: (err: any) => {
+        if (err.response.data.message) {
+          switchErrorHandling(err.response.data.message);
+        } else {
+          switchErrorHandling(err.response.data);
+        }
+      },
+    }
+  );
+  return { updateTaskMutation, deleteTaskListMutation };
 };

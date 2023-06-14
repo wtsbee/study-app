@@ -13,7 +13,7 @@ import { Task, TaskList } from "@/types";
 
 const Board = () => {
   const { data: resData, isLoading, isError, refetch } = useQueryTasks();
-  const { updateTaskMutation } = useMutateTask();
+  const { updateTaskMutation, deleteTaskListMutation } = useMutateTask();
   const [data, setData] = useState<TaskList[]>([]);
   const [isEdit, setIsEdit] = useState(false);
   const [input, setInput] = useState("");
@@ -36,6 +36,13 @@ const Board = () => {
     await updateTaskMutation.mutateAsync([...data, { name: input, tasks: [] }]);
     setInput("");
     await refetch();
+  };
+
+  const deleteList = (section: TaskList, index: number) => {
+    const newData = [...data];
+    newData.splice(index, 1);
+    deleteTaskListMutation.mutate(section.id as number);
+    socketRef.current?.send(JSON.stringify(newData));
   };
 
   useEffect(() => {
@@ -224,8 +231,23 @@ const Board = () => {
                                 ref={provided.innerRef}
                                 {...provided.droppableProps}
                               >
-                                <div className="trello-section-title font-bold">
-                                  {section.name}
+                                <div className="flex justify-between trello-section-title font-bold">
+                                  <span>{section.name}</span>
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    strokeWidth={1.5}
+                                    stroke="currentColor"
+                                    className="w-6 h-6 hover:bg-pink-200 cursor-pointer rounded"
+                                    onClick={() => deleteList(section, index)}
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      d="M6 18L18 6M6 6l12 12"
+                                    />
+                                  </svg>
                                 </div>
                                 <div className="trello-section-content">
                                   {section.tasks?.map((task, index) => (
