@@ -6,6 +6,7 @@ import {
 } from "react-beautiful-dnd";
 import { useEffect, useRef, useState } from "react";
 import BoardCard from "./BoardCard";
+import NewCard from "./newCard";
 import Header from "@/components/header/Header";
 import { useQueryTasks } from "@/hooks/useQueryTasks";
 import { useMutateTask } from "@/hooks/useMutateTask";
@@ -38,10 +39,10 @@ const Board = () => {
     await refetch();
   };
 
-  const deleteList = (section: TaskList, index: number) => {
+  const deleteList = (tasklist: TaskList, index: number) => {
     const newData = [...data];
     newData.splice(index, 1);
-    deleteTaskListMutation.mutate(section.id as number);
+    deleteTaskListMutation.mutate(tasklist.id as number);
     socketRef.current?.send(JSON.stringify(newData));
   };
 
@@ -66,10 +67,10 @@ const Board = () => {
 
     // コンポーネントのアンマウント時にWebSocket接続をクローズ
     return () => {
-      if (socketRef.current == null) {
+      if (socketRef.current === null) {
         return;
       }
-      socketRef.current.close();
+      socketRef.current?.close();
     };
   }, []);
 
@@ -93,7 +94,7 @@ const Board = () => {
     const { source, destination } = result;
 
     const newData = [...data];
-    if (source.droppableId == "board") {
+    if (source.droppableId === "board") {
       // 要素の移動
       const startIndex = source.index;
       const endIndex = destination.index;
@@ -275,6 +276,7 @@ const Board = () => {
                                   ))}
                                 </div>
                                 {provided.placeholder}
+                                <NewCard taskList={section} index={index} />
                               </div>
                             )}
                           </Droppable>
