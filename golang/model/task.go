@@ -19,6 +19,13 @@ type Task struct {
 	DeletedAt  gorm.DeletedAt `json:"deleted_at"`
 }
 
+type TaskRequest struct {
+	ID         uint   `json:"id"`
+	Title      string `json:"title"`
+	TaskListId uint   `json:"task_list_id"`
+	Rank       uint   `json:"rank"`
+}
+
 type TaskResponse struct {
 	ID    uint   `json:"id"`
 	Title string `json:"title"`

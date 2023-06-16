@@ -8,6 +8,7 @@ import (
 // // インターフェース
 type ITaskUsecase interface {
 	GetOwnAllTasks(userId uint) ([]model.TaskListResponse, error)
+	CreateTask(task model.TaskRequest, userId uint) error
 	UpdateOwnAllTasks(taskList []model.TaskListResponse, userId uint) error
 	DeleteTaskList(taskListId uint, userId uint) error
 }
@@ -49,6 +50,13 @@ func (tu *taskUsecase) GetOwnAllTasks(userId uint) ([]model.TaskListResponse, er
 		}
 	}
 	return tasks, nil
+}
+
+func (tu *taskUsecase) CreateTask(task model.TaskRequest, userId uint) error {
+	if err := tu.tr.CreateTask(&task, userId); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (tu *taskUsecase) UpdateOwnAllTasks(taskList []model.TaskListResponse, userId uint) error {

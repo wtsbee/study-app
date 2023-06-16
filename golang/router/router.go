@@ -31,14 +31,20 @@ func NewRouter(uc controller.IUserController, tc controller.ITaskController) *ec
 	e.POST("/login", uc.LogIn)
 	e.POST("/logout", uc.LogOut)
 	e.GET("/csrf", uc.CsrfToken)
-	t := e.Group("/tasks")
-	t.GET("/ws", tc.WebSocketHandler)
+	t := e.Group("/task")
 	t.Use(echojwt.WithConfig(echojwt.Config{
 		SigningKey:  []byte(os.Getenv("SECRET_KEY")),
 		TokenLookup: "cookie:token",
 	}))
-	t.GET("", tc.GetOwnAllTasks)
-	t.POST("", tc.UpdateOwnAllTasks)
-	t.DELETE("/:id", tc.DeleteTaskList)
+	t.POST("", tc.CreateTask)
+	ts := e.Group("/tasks")
+	ts.GET("/ws", tc.WebSocketHandler)
+	ts.Use(echojwt.WithConfig(echojwt.Config{
+		SigningKey:  []byte(os.Getenv("SECRET_KEY")),
+		TokenLookup: "cookie:token",
+	}))
+	ts.GET("", tc.GetOwnAllTasks)
+	ts.POST("", tc.UpdateOwnAllTasks)
+	ts.DELETE("/:id", tc.DeleteTaskList)
 	return e
 }
