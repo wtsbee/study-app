@@ -34,9 +34,14 @@ const Board = () => {
   };
 
   const addList = async () => {
-    await updateTaskMutation.mutateAsync([...data, { name: input, tasks: [] }]);
-    setInput("");
-    await refetch();
+    if (input !== "") {
+      await updateTaskMutation.mutateAsync([
+        ...data,
+        { name: input, tasks: [] },
+      ]);
+      setInput("");
+      await refetch();
+    }
   };
 
   const deleteList = (tasklist: TaskList, index: number) => {
@@ -276,7 +281,7 @@ const Board = () => {
                                   ))}
                                 </div>
                                 {provided.placeholder}
-                                <NewCard taskList={section} index={index} />
+                                <NewCard taskList={section} />
                               </div>
                             )}
                           </Droppable>

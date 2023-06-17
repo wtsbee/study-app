@@ -16,4 +16,6 @@ export type TaskList = {
 export type Task = {
   id: number | null;
   title: string;
+  task_list_id?: number;
+  rank?: number;
 };

@@ -1,21 +1,44 @@
 import { useState } from "react";
 import { Task, TaskList } from "@/types";
+import { useMutateTask } from "@/hooks/useMutateTask";
+import { useQueryTasks } from "@/hooks/useQueryTasks";
 
-type Props = {
+interface Props {
   taskList: TaskList;
-  index: number;
-};
+}
 
-const newCard = ({ taskList, index }: Props) => {
+const newCard = ({ taskList }: Props) => {
+  const { refetch } = useQueryTasks();
+  const { createTaskMutation } = useMutateTask();
   const [isEdit, setIsEdit] = useState(false);
+  const [input, setInput] = useState("");
+
+  const inputText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInput(e.target.value);
+  };
 
   const openCard = () => {
-    console.log(taskList, index);
     setIsEdit(true);
   };
 
   const closeCard = () => {
     setIsEdit(false);
+  };
+
+  const addCard = async () => {
+    if (input !== "") {
+      const rank: number =
+        taskList.tasks === null ? 1 : taskList.tasks.length + 1;
+
+      await createTaskMutation.mutateAsync({
+        id: null,
+        title: input,
+        task_list_id: taskList.id,
+        rank,
+      });
+      setInput("");
+      await refetch();
+    }
   };
 
   return (
@@ -24,12 +47,17 @@ const newCard = ({ taskList, index }: Props) => {
         <>
           <div className="mt-2 p-5 bg-pink-300 rounded">
             <textarea
-              placeholder="タイトルを入力してください"
+              onChange={inputText}
+              value={input}
+              placeholder="タスクを入力してください"
               className=" w-full placeholder-black bg-pink-300 outline-none"
             />
           </div>
           <div className="flex items-center mt-2 ">
-            <button className="py-2 px-4 rounded text-white bg-blue-500 font-bold hover:cursor-pointer">
+            <button
+              onClick={addCard}
+              className="py-2 px-4 rounded text-white bg-blue-500 font-bold hover:cursor-pointer"
+            >
               カードを追加
             </button>
             <svg
