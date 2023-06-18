@@ -1,3 +1,19 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.markdown ul {
+  @apply list-disc;
+}
+
+.markdown ul > li > ul {
+  @apply list-circle;
+}
+
+.markdown ul > li > ul > li > ul {
+  @apply list-square;
+}
+
+.markdown ol {
+  @apply list-decimal;
+}

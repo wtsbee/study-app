@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import axios from "axios";
 import Home from "@/components/pages/Home";
 import Auth from "@/components/pages/Auth";
+import Markdown from "@/components/pages/MarkDown";
 import Board from "@/components/pages/Board/Board";
 import { CsrfToken } from "@/types";
 
@@ -28,6 +29,7 @@ function App() {
               <Route path="/" element={<Auth />} />
               <Route path="/home" element={<Home />} />
               <Route path="/board" element={<Board />} />
+              <Route path="/markdown" element={<Markdown />} />
             </Routes>
           </BrowserRouter>
         </div>
