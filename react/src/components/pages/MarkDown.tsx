@@ -5,7 +5,7 @@ const Markdown = () => {
   return (
     <>
       <Header />
-      <div className="markdown-body markdown ml-2 mt-2">
+      <div className="markdown-body markdown">
         <MarDownMain />
       </div>
     </>

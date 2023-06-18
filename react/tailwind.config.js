@@ -11,6 +11,9 @@ export default {
         circle: "circle",
         square: "square",
       },
+      colors: {
+        "light-black": "#333333",
+      },
     },
   },
   plugins: [],
