@@ -55,7 +55,7 @@ const html = markdownString.replace(/\n/g, "<br>");
 const MarkdownMain = () => {
   return (
     <>
-      <div className="flex h-[calc(100vh-3rem)] md:h-[calc(100vh-3.5rem)]">
+      <div className="flex h-screen pt-12 md:pt-14 fixed left-0 right-0">
         <div
           className="w-1/2 px-5 pb-10 text-white bg-light-black overflow-scroll"
           dangerouslySetInnerHTML={{ __html: html }}

@@ -161,7 +161,7 @@ const Board = () => {
   return (
     <>
       <Header></Header>
-      <div className="mx-1 overflow-auto min-h-[calc(100%_-_48px) md:min-h-[calc(100%_-_56px)]">
+      <div className="mx-1 overflow-auto min-h-[calc(100%_-_48px) md:min-h-[calc(100%_-_56px)] pt-12 md:pt-14">
         <div className="ml-2">
           <h1 className="my-2 font-bold text-xl">タスク管理</h1>
           {isEdit ? (
