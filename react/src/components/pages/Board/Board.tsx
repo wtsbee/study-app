@@ -207,7 +207,7 @@ const Board = () => {
           )}
         </div>
         <DragDropContext onDragEnd={onDragEnd}>
-          <div className="trello ml-1">
+          <div className="trello ml-1 mb-10">
             <Droppable droppableId="board" direction="horizontal" type="board">
               {(provided) => (
                 <div

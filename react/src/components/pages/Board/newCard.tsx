@@ -38,6 +38,7 @@ const newCard = ({ taskList }: Props) => {
       });
       setInput("");
       await refetch();
+      setIsEdit(false);
     }
   };
 
