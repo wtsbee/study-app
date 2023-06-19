@@ -2,67 +2,31 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "github-markdown-css";
 import emoji from "remark-emoji";
+import { useState } from "react";
 
-const markdownString = `
-# GFM
-- [https://example.com](https://example.com)
-
-- :smile:
-
-## aaa
-- **aaa**
-  - aaa
-    - aaa
-      - aaa
-* aaa
-
-### bbb
-
-#### ccc
-
-- **ccc**
-- :star:
-
-Lorem ipsum dolor sit amet consectetur, adipisicing elit. Magni, nemo!
-
-## Autolink literals
-
-www.example.com, https://example.com, and contact@example.com.
-
-## Footnote
-
-A note[^1]
-
-[^1]: Big note.
-
-## Strikethrough
-
-~one~ or ~~two~~ tildes.
-
-## Table
-
-| a | b  |  c |  d  |
-| - | :- | -: | :-: |
-
-## Tasklist
-
-* [ ] to do
-* [x] done
-`;
+const markdownString = ``;
 
 const html = markdownString.replace(/\n/g, "<br>");
 
 const MarkdownMain = () => {
+  const [text, setText] = useState(markdownString);
+
+  const inputText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setText(e.target.value);
+  };
+
   return (
     <>
       <div className="flex h-screen pt-12 md:pt-14 fixed left-0 right-0">
-        <div
-          className="w-1/2 px-5 pb-10 text-white bg-light-black overflow-scroll"
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
-        <div className="w-1/2 px-5 pb-10 overflow-scroll">
+        <textarea
+          onChange={inputText}
+          value={text}
+          spellCheck={false}
+          className="resize-none w-1/2 px-5 pt-2 pb-10 text-white bg-light-black overflow-scroll border-none outline-none"
+        ></textarea>
+        <div className="w-1/2 px-5 pt-2 pb-10 overflow-scroll">
           <ReactMarkdown remarkPlugins={[remarkGfm, emoji]}>
-            {markdownString}
+            {text}
           </ReactMarkdown>
         </div>
       </div>
