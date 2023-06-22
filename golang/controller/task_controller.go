@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -16,6 +17,7 @@ import (
 type ITaskController interface {
 	GetOwnAllTasks(c echo.Context) error
 	CreateTask(c echo.Context) error
+	UpdateTask(c echo.Context) error
 	UpdateOwnAllTasks(c echo.Context) error
 	DeleteTaskList(c echo.Context) error
 	WebSocketHandler(c echo.Context) error
@@ -69,6 +71,27 @@ func (tc *taskController) CreateTask(c echo.Context) error {
 	return nil
 }
 
+func (tc *taskController) UpdateTask(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	id := c.Param("id")
+	taskId, _ := strconv.Atoi(id)
+
+	task := model.TaskRequest{}
+	if err := c.Bind(&task); err != nil {
+		log.Println("controller CreateTask リクエストデータ取得エラー: ", err)
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
+	}
+	err := tc.tu.UpdateTask(task, uint(userId.(float64)), uint(taskId))
+	if err != nil {
+		log.Println("controller CreateTask タスク更新エラー: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+	log.Println("controller CreateTask : タスク更新成功")
+	return nil
+}
+
 func (tc *taskController) UpdateOwnAllTasks(c echo.Context) error {
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
@@ -115,6 +138,7 @@ func (tc *taskController) WebSocketHandler(c echo.Context) error {
 			log.Println("websocketHandler Read error:", err)
 			break
 		}
+		fmt.Println("message: ", message)
 
 		// 受信したメッセージを全てのクライアントに送信
 		for client := range clients {

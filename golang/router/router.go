@@ -37,6 +37,7 @@ func NewRouter(uc controller.IUserController, tc controller.ITaskController) *ec
 		TokenLookup: "cookie:token",
 	}))
 	t.POST("", tc.CreateTask)
+	t.POST("/:id", tc.UpdateTask)
 	ts := e.Group("/tasks")
 	ts.GET("/ws", tc.WebSocketHandler)
 	ts.Use(echojwt.WithConfig(echojwt.Config{
