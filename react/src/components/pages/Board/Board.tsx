@@ -274,7 +274,7 @@ const Board = () => {
                                               : "1",
                                           }}
                                         >
-                                          <BoardCard>{task.title}</BoardCard>
+                                          <BoardCard>{task}</BoardCard>
                                         </div>
                                       )}
                                     </Draggable>
