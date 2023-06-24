@@ -256,10 +256,10 @@ const Board = () => {
                                   </svg>
                                 </div>
                                 <div className="trello-section-content">
-                                  {section.tasks?.map((task, index) => (
+                                  {section.tasks?.map((task, cardIndex) => (
                                     <Draggable
                                       draggableId={task.id.toString()}
-                                      index={index}
+                                      index={cardIndex}
                                       key={task.id}
                                     >
                                       {(provided, snapshot) => (
@@ -274,7 +274,12 @@ const Board = () => {
                                               : "1",
                                           }}
                                         >
-                                          <BoardCard>{task}</BoardCard>
+                                          <BoardCard
+                                            listIndex={index}
+                                            cardIndex={cardIndex}
+                                          >
+                                            {task}
+                                          </BoardCard>
                                         </div>
                                       )}
                                     </Draggable>

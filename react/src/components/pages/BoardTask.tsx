@@ -3,28 +3,75 @@ import Header from "@/components/header/Header";
 import BoardTaskMain from "@/components/boardTask/BoardTaskMain";
 import { useEffect, useRef, useState } from "react";
 import { useMutateTask } from "@/hooks/useMutateTask";
-import { useQueryTaskById } from "@/hooks/useQueryTasks";
-import { Task } from "@/types";
+import { useQueryTaskById, useQueryTasks } from "@/hooks/useQueryTasks";
+import { Task, TaskList } from "@/types";
 
 const BoardTask = () => {
   const location = useLocation();
   const taskId = location.pathname.split("/")[2];
   const [isEdit, setIsEdit] = useState(false);
   const insideRef = useRef<HTMLInputElement>(null);
-  const { updateTaskMutation } = useMutateTask();
-  const { data } = useQueryTaskById(taskId);
+  const { updateTaskMutation, updateTasksMutation } = useMutateTask();
+  const { data: taskListArray } = useQueryTasks();
+  const [data, setData] = useState<TaskList[]>([]);
+  const { data: task } = useQueryTaskById(taskId);
   const [input, setInput] = useState("");
+  const socketRef = useRef<WebSocket>();
 
   const editTitle = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
   };
 
+  const fetchIndex = (str: string): string => {
+    const params = new URLSearchParams(location.search);
+    const listValue = params.get(str);
+    return listValue as string;
+  };
+
+  const listIndex = Number(fetchIndex("list"));
+  const cardIndex = Number(fetchIndex("card"));
+
   useEffect(() => {
-    if (data) {
-      console.log("aaaaaaa");
-      setInput(data.title);
+    if (task) {
+      setInput(task.title);
     }
-  }, [data]);
+  }, [task]);
+
+  useEffect(() => {
+    socketRef.current = new WebSocket(
+      `${import.meta.env.VITE_BACKEND_WEBSOCKET_URL}/tasks/ws`
+    );
+
+    socketRef.current.onopen = () => {
+      console.log("ws接続");
+    };
+
+    socketRef.current.onclose = () => {
+      console.log("ws切断");
+    };
+
+    // メッセージ受信時の処理
+    socketRef.current.onmessage = (event) => {
+      console.log("ws受信");
+      setInput(JSON.parse(event.data)[listIndex].tasks[cardIndex].title);
+      setData(JSON.parse(event.data));
+    };
+
+    // コンポーネントのアンマウント時にWebSocket接続をクローズ
+    return () => {
+      if (socketRef.current === null) {
+        return;
+      }
+      socketRef.current?.close();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (taskListArray) {
+      setData(taskListArray);
+      socketRef.current?.send(JSON.stringify(taskListArray));
+    }
+  }, [taskListArray]);
 
   useEffect(() => {
     //対象の要素を取得
@@ -40,10 +87,15 @@ const BoardTask = () => {
         if (isEdit) {
           console.log("外側クリック");
           await updateTaskMutation.mutateAsync({
-            ...(data as Task),
+            ...(task as Task),
             title: input,
           });
           setIsEdit(false);
+
+          const newData = [...data];
+          newData[listIndex].tasks[cardIndex].title = input;
+          updateTasksMutation.mutate(newData);
+          socketRef.current?.send(JSON.stringify(newData));
         }
       } else {
         //ここに内側をクリックしたきの処理
