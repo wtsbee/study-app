@@ -7,6 +7,7 @@ import (
 
 // // インターフェース
 type ITaskUsecase interface {
+	GetTask(taskId uint, userId uint) (model.Task, error)
 	GetOwnAllTasks(userId uint) ([]model.TaskListResponse, error)
 	CreateTask(task model.TaskRequest, userId uint) error
 	UpdateTask(task model.TaskRequest, userId uint, taskId uint) error
@@ -21,6 +22,14 @@ type taskUsecase struct {
 // コンストラクタ
 func NewTaskUsecase(tr repository.ITaskRepository) ITaskUsecase {
 	return &taskUsecase{tr}
+}
+
+func (tu *taskUsecase) GetTask(taskID uint, userId uint) (model.Task, error) {
+	task := model.Task{}
+	if err := tu.tr.GetTask(&task, taskID, userId); err != nil {
+		return model.Task{}, err
+	}
+	return task, nil
 }
 
 func (tu *taskUsecase) GetOwnAllTasks(userId uint) ([]model.TaskListResponse, error) {

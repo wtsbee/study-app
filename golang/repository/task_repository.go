@@ -8,6 +8,7 @@ import (
 
 // インターフェース
 type ITaskRepository interface {
+	GetTask(task *model.Task, taskId uint, userId uint) error
 	GetOwnAllTasks(tasks *[]model.TaskAndTaskListResponse, userId uint) error
 	CreateTask(task *model.TaskRequest, userId uint) error
 	UpdateTask(task *model.TaskRequest, userId uint, taskId uint) error
@@ -22,6 +23,14 @@ type taskRepository struct {
 // コンストラクタ
 func NewTaskRepository(db *gorm.DB) ITaskRepository {
 	return &taskRepository{db}
+}
+
+func (tr *taskRepository) GetTask(task *model.Task, taskId uint, userId uint) error {
+	err := tr.db.Table("tasks").Where("id = ? AND user_id = ? AND deleted_at IS NULL", taskId, userId).First(&task).Error
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (tr *taskRepository) GetOwnAllTasks(ttl *[]model.TaskAndTaskListResponse, userId uint) error {

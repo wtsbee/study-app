@@ -36,6 +36,7 @@ func NewRouter(uc controller.IUserController, tc controller.ITaskController) *ec
 		SigningKey:  []byte(os.Getenv("SECRET_KEY")),
 		TokenLookup: "cookie:token",
 	}))
+	t.GET("/:id", tc.GetTask)
 	t.POST("", tc.CreateTask)
 	t.POST("/:id", tc.UpdateTask)
 	ts := e.Group("/tasks")

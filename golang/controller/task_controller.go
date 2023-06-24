@@ -16,6 +16,7 @@ import (
 // インターフェース
 type ITaskController interface {
 	GetOwnAllTasks(c echo.Context) error
+	GetTask(c echo.Context) error
 	CreateTask(c echo.Context) error
 	UpdateTask(c echo.Context) error
 	UpdateOwnAllTasks(c echo.Context) error
@@ -38,6 +39,23 @@ var (
 
 func NewTaskController(ut usecase.ITaskUsecase) ITaskController {
 	return &taskController{ut}
+}
+
+func (tc *taskController) GetTask(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	id := c.Param("id")
+	taskId, _ := strconv.Atoi(id)
+
+	task, err := tc.tu.GetTask(uint(taskId), uint(userId.(float64)))
+	if err != nil {
+		log.Println("controller GetTask タスク取得エラー: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+	log.Println("controller GetTask : タスク取得成功")
+	taskRes := model.TaskResponse{ID: task.ID, Title: task.Title}
+	return c.JSON(http.StatusOK, taskRes)
 }
 
 func (tc *taskController) GetOwnAllTasks(c echo.Context) error {
