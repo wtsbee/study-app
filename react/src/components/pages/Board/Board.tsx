@@ -14,7 +14,7 @@ import { Task, TaskList } from "@/types";
 
 const Board = () => {
   const { data: resData, isLoading, isError, refetch } = useQueryTasks();
-  const { updateTaskMutation, deleteTaskListMutation } = useMutateTask();
+  const { updateTasksMutation, deleteTaskListMutation } = useMutateTask();
   const [data, setData] = useState<TaskList[]>([]);
   const [isEdit, setIsEdit] = useState(false);
   const [input, setInput] = useState("");
@@ -35,7 +35,7 @@ const Board = () => {
 
   const addList = async () => {
     if (input !== "") {
-      await updateTaskMutation.mutateAsync([
+      await updateTasksMutation.mutateAsync([
         ...data,
         { name: input, tasks: [] },
       ]);
@@ -154,7 +154,7 @@ const Board = () => {
 
       // setData(newData);
     }
-    updateTaskMutation.mutate(newData);
+    updateTasksMutation.mutate(newData);
     socketRef.current?.send(JSON.stringify(newData));
   };
 

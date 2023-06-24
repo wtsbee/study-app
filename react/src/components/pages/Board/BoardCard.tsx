@@ -8,7 +8,7 @@ interface ChildrenProps {
 const BoardCard = ({ children: task }: ChildrenProps) => {
   return (
     <div className="card p-5 bg-pink-200 rounded mt-2">
-      <Link to={`/board/${task.id}`} state={task.title}>
+      <Link to={`/board/${task.id}`} state={task}>
         {task.title}
       </Link>
     </div>

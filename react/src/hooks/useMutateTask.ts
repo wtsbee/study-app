@@ -27,6 +27,25 @@ export const useMutateTask = () => {
     }
   );
   const updateTaskMutation = useMutation(
+    (task: Task) =>
+      axios({
+        method: "post",
+        url: `${import.meta.env.VITE_BACKEND_URL}/task/${task.id}`,
+        data: { title: task.title },
+        withCredentials: true,
+      }),
+    {
+      onSuccess: () => {},
+      onError: (err: any) => {
+        if (err.response.data.message) {
+          switchErrorHandling(err.response.data.message);
+        } else {
+          switchErrorHandling(err.response.data);
+        }
+      },
+    }
+  );
+  const updateTasksMutation = useMutation(
     (task: TaskList[]) =>
       axios<TaskList[]>({
         method: "post",
@@ -63,5 +82,10 @@ export const useMutateTask = () => {
       },
     }
   );
-  return { createTaskMutation, updateTaskMutation, deleteTaskListMutation };
+  return {
+    createTaskMutation,
+    updateTaskMutation,
+    updateTasksMutation,
+    deleteTaskListMutation,
+  };
 };
