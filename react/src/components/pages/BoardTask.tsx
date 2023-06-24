@@ -69,7 +69,6 @@ const BoardTask = () => {
   useEffect(() => {
     if (taskListArray) {
       setData(taskListArray);
-      socketRef.current?.send(JSON.stringify(taskListArray));
     }
   }, [taskListArray]);
 
