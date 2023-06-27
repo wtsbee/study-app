@@ -10,7 +10,7 @@ import (
 type ITaskRepository interface {
 	GetTask(task *model.Task, taskId uint, userId uint) error
 	GetOwnAllTasks(tasks *[]model.TaskAndTaskListResponse, userId uint) error
-	CreateTask(task *model.TaskRequest, userId uint) error
+	CreateTask(task *model.Task, userId uint) error
 	UpdateTask(task *model.TaskRequest, userId uint, taskId uint) error
 	UpdateOwnAllTasks(taskList *[]model.TaskListResponse, userId uint) error
 	DeleteTaskList(taskListId uint, userId uint) error
@@ -47,8 +47,8 @@ func (tr *taskRepository) GetOwnAllTasks(ttl *[]model.TaskAndTaskListResponse, u
 	return nil
 }
 
-func (tr *taskRepository) CreateTask(task *model.TaskRequest, userId uint) error {
-	result := tr.db.Create(&model.Task{Title: task.Title, UserId: userId, TaskListId: task.TaskListId, Rank: task.Rank})
+func (tr *taskRepository) CreateTask(task *model.Task, userId uint) error {
+	result := tr.db.Create(task)
 	if result.Error != nil {
 		return result.Error
 	}

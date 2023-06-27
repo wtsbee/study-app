@@ -16,12 +16,13 @@ type ITaskUsecase interface {
 }
 
 type taskUsecase struct {
-	tr repository.ITaskRepository
+	tr  repository.ITaskRepository
+	tdr repository.ITaskDetailRepository
 }
 
 // コンストラクタ
-func NewTaskUsecase(tr repository.ITaskRepository) ITaskUsecase {
-	return &taskUsecase{tr}
+func NewTaskUsecase(tr repository.ITaskRepository, tdr repository.ITaskDetailRepository) ITaskUsecase {
+	return &taskUsecase{tr, tdr}
 }
 
 func (tu *taskUsecase) GetTask(taskID uint, userId uint) (model.Task, error) {
@@ -63,7 +64,13 @@ func (tu *taskUsecase) GetOwnAllTasks(userId uint) ([]model.TaskListResponse, er
 }
 
 func (tu *taskUsecase) CreateTask(task model.TaskRequest, userId uint) error {
-	if err := tu.tr.CreateTask(&task, userId); err != nil {
+	// タスクの作成
+	taskInstance := &model.Task{Title: task.Title, UserId: userId, TaskListId: task.TaskListId, Rank: task.Rank}
+	if err := tu.tr.CreateTask(taskInstance, userId); err != nil {
+		return err
+	}
+	// タスク詳細の作成
+	if err := tu.tdr.CreateTaskDetail(taskInstance.ID, userId); err != nil {
 		return err
 	}
 	return nil
