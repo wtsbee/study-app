@@ -3,21 +3,33 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "github-markdown-css";
 import emoji from "remark-emoji";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useQueryTaskDetailByTaskId } from "@/hooks/useQueryTasks";
+import { TaskDetail } from "@/types";
 
 const markdownString = ``;
 
 const html = markdownString.replace(/\n/g, "<br>");
 
 const MarkdownMain = () => {
-  // const location = useLocation();
   const [text, setText] = useState(markdownString);
+  const taskId = location.pathname.split("/")[2];
+  const { data: taskDetail } = useQueryTaskDetailByTaskId(taskId);
 
   const inputText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
   };
 
-  // console.log(location.state);
+  useEffect(() => {
+    if (taskDetail) {
+      if (taskDetail == "RecordNotFound") {
+        // TODO:タスク詳細を作成する
+      } else {
+        const detail = (taskDetail as TaskDetail).detail;
+        setText(detail);
+      }
+    }
+  }, [taskDetail]);
 
   return (
     <>

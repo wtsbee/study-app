@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useQuery } from "@tanstack/react-query";
-import { TaskList, Task } from "../types";
+import { Task, TaskDetail, TaskList } from "../types";
 import { useError } from "../hooks/useError";
 
 export const useQueryTaskById = (id: string) => {
@@ -40,6 +40,30 @@ export const useQueryTasks = () => {
   return useQuery<TaskList[], Error>({
     queryKey: ["tasks"],
     queryFn: getTasks,
+    staleTime: Infinity,
+    onError: (err: any) => {
+      if (err.response.data.message) {
+        switchErrorHandling(err.response.data.message);
+      } else {
+        switchErrorHandling(err.response.data);
+      }
+    },
+  });
+};
+
+export const useQueryTaskDetailByTaskId = (id: string) => {
+  const { switchErrorHandling } = useError();
+  const getTaskDetailByTaskId = async () => {
+    const { data } = await axios<TaskDetail | string>({
+      method: "get",
+      url: `${import.meta.env.VITE_BACKEND_URL}/task/${id}/detail`,
+      withCredentials: true,
+    });
+    return data;
+  };
+  return useQuery<TaskDetail | string, Error>({
+    queryKey: ["taskDetail", id],
+    queryFn: getTaskDetailByTaskId,
     staleTime: Infinity,
     onError: (err: any) => {
       if (err.response.data.message) {

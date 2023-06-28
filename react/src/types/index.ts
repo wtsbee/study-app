@@ -19,3 +19,9 @@ export type Task = {
   task_list_id?: number;
   rank?: number;
 };
+
+export type TaskDetail = {
+  id: number;
+  detail: string;
+  task_id?: number;
+};
