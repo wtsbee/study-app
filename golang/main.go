@@ -18,8 +18,10 @@ func main() {
 	taskDetailRepository := repository.NewTaskDetailRepository(db)
 	userUsecase := usecase.NewUserUsecase(userRepository, userValidator)
 	taskUsecase := usecase.NewTaskUsecase(taskRepository, taskDetailRepository)
+	taskDetailUsecase := usecase.NewTaskDetailUsecase(taskDetailRepository)
 	userController := controller.NewUserController(userUsecase)
 	taskController := controller.NewTaskController(taskUsecase)
-	e := router.NewRouter(userController, taskController)
+	taskDetailController := controller.NewTaskDetailController(taskDetailUsecase)
+	e := router.NewRouter(userController, taskController, taskDetailController)
 	e.Logger.Fatal(e.Start(":8080"))
 }

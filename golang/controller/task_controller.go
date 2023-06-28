@@ -37,8 +37,9 @@ var (
 	clients = make(map[*websocket.Conn]bool)
 )
 
-func NewTaskController(ut usecase.ITaskUsecase) ITaskController {
-	return &taskController{ut}
+// コンストラクタ
+func NewTaskController(tu usecase.ITaskUsecase) ITaskController {
+	return &taskController{tu}
 }
 
 func (tc *taskController) GetTask(c echo.Context) error {
