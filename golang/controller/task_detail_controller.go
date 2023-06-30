@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -44,7 +43,7 @@ func (tdc *taskDetailController) GetTaskDetail(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
 	log.Println("controller GetTaskDetail : タスク詳細取得成功")
-	taskDetailRes := model.TaskDetailResponse{ID: taskDetail.ID, Detail: taskDetail.Detail}
+	taskDetailRes := model.TaskDetailResponse{ID: taskDetail.ID, Detail: taskDetail.Detail, TaskId: taskDetail.TaskId}
 	return c.JSON(http.StatusOK, taskDetailRes)
 }
 
@@ -53,7 +52,6 @@ func (tdc *taskDetailController) UpdateTaskDetail(c echo.Context) error {
 	claims := user.Claims.(jwt.MapClaims)
 	userId := claims["user_id"]
 	taskDetail := model.TaskDetailRequest{}
-	fmt.Println("taskDetail:", taskDetail)
 	if err := c.Bind(&taskDetail); err != nil {
 		log.Println("controller UpdateTaskDetail リクエストデータ取得エラー: ", err)
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})

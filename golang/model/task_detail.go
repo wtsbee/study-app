@@ -19,12 +19,13 @@ type TaskDetail struct {
 }
 
 type TaskDetailRequest struct {
-	ID     uint   `json:"id" gorm:"primaryKey"`
+	ID     uint   `json:"id"`
 	Detail string `json:"detail"`
-	TaskId uint   `json:"task_id" gorm:"not null"`
+	TaskId uint   `json:"task_id"`
 }
 
 type TaskDetailResponse struct {
 	ID     uint   `json:"id"`
 	Detail string `json:"detail"`
+	TaskId uint   `json:"task_id"`
 }
