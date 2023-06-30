@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -14,6 +15,7 @@ import (
 // インターフェース
 type ITaskDetailController interface {
 	GetTaskDetail(c echo.Context) error
+	UpdateTaskDetail(c echo.Context) error
 }
 
 type taskDetailController struct {
@@ -44,4 +46,18 @@ func (tdc *taskDetailController) GetTaskDetail(c echo.Context) error {
 	log.Println("controller GetTaskDetail : タスク詳細取得成功")
 	taskDetailRes := model.TaskDetailResponse{ID: taskDetail.ID, Detail: taskDetail.Detail}
 	return c.JSON(http.StatusOK, taskDetailRes)
+}
+
+func (tdc *taskDetailController) UpdateTaskDetail(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	taskDetail := model.TaskDetailRequest{}
+	fmt.Println("taskDetail:", taskDetail)
+	if err := c.Bind(&taskDetail); err != nil {
+		log.Println("controller UpdateTaskDetail リクエストデータ取得エラー: ", err)
+		return c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
+	}
+	tdc.tdu.UpdateTaskDetail(taskDetail, uint(userId.(float64)))
+	return nil
 }

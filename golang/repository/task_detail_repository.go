@@ -11,6 +11,7 @@ import (
 type ITaskDetailRepository interface {
 	GetTaskDetail(taskDetail *model.TaskDetail, taskId uint, userId uint) error
 	CreateTaskDetail(taskId uint, userId uint) error
+	UpdateTaskDetail(taskDetail *model.TaskDetailRequest, userId uint) error
 }
 
 type taskDetailRepository struct {
@@ -35,6 +36,14 @@ func (tdr *taskDetailRepository) GetTaskDetail(taskDetail *model.TaskDetail, tas
 
 func (tdr *taskDetailRepository) CreateTaskDetail(taskId uint, userId uint) error {
 	result := tdr.db.Create(&model.TaskDetail{TaskId: taskId, UserId: userId})
+	if result.Error != nil {
+		return result.Error
+	}
+	return nil
+}
+
+func (tdr *taskDetailRepository) UpdateTaskDetail(taskDetail *model.TaskDetailRequest, userId uint) error {
+	result := tdr.db.Updates(&model.TaskDetail{ID: taskDetail.ID, Detail: taskDetail.Detail})
 	if result.Error != nil {
 		return result.Error
 	}

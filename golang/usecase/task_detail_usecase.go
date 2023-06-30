@@ -8,6 +8,7 @@ import (
 // // インターフェース
 type ITaskDetailUsecase interface {
 	GetTaskDetail(taskID uint, userId uint) (model.TaskDetail, error)
+	UpdateTaskDetail(taskDetail model.TaskDetailRequest, userId uint) error
 }
 
 type taskDetailUsecase struct {
@@ -25,4 +26,11 @@ func (tdu *taskDetailUsecase) GetTaskDetail(taskID uint, userId uint) (model.Tas
 		return model.TaskDetail{}, err
 	}
 	return taskDetail, nil
+}
+
+func (tdu *taskDetailUsecase) UpdateTaskDetail(taskDetail model.TaskDetailRequest, userId uint) error {
+	if err := tdu.tdr.UpdateTaskDetail(&taskDetail, userId); err != nil {
+		return err
+	}
+	return nil
 }
