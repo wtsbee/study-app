@@ -56,6 +56,11 @@ func (tdc *taskDetailController) UpdateTaskDetail(c echo.Context) error {
 		log.Println("controller UpdateTaskDetail リクエストデータ取得エラー: ", err)
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
 	}
-	tdc.tdu.UpdateTaskDetail(taskDetail, uint(userId.(float64)))
+	err := tdc.tdu.UpdateTaskDetail(taskDetail, uint(userId.(float64)))
+	if err != nil {
+		log.Println("controller UpdateTaskDetail タスク詳細更新エラー: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+	log.Println("controller UpdateTaskDetail : タスク詳細更新成功")
 	return nil
 }
