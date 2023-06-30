@@ -3,8 +3,9 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import "github-markdown-css";
 import emoji from "remark-emoji";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQueryTaskDetailByTaskId } from "@/hooks/useQueryTasks";
+import { useMutateTask } from "@/hooks/useMutateTask";
 import { TaskDetail } from "@/types";
 
 const markdownString = ``;
@@ -15,9 +16,15 @@ const MarkdownMain = () => {
   const [text, setText] = useState(markdownString);
   const taskId = location.pathname.split("/")[2];
   const { data: taskDetail } = useQueryTaskDetailByTaskId(taskId);
+  const { updateTaskDetailMutation } = useMutateTask();
+  const socketRef = useRef<WebSocket>();
 
-  const inputText = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+  const inputText = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
+    await updateTaskDetailMutation.mutateAsync({
+      ...(taskDetail as TaskDetail),
+      detail: e.target.value,
+    });
   };
 
   useEffect(() => {

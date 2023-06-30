@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
-import { Task, TaskList } from "../types";
+import { Task, TaskDetail, TaskList } from "../types";
 import { useError } from "../hooks/useError";
 
 export const useMutateTask = () => {
@@ -32,6 +32,31 @@ export const useMutateTask = () => {
         method: "post",
         url: `${import.meta.env.VITE_BACKEND_URL}/task/${task.id}`,
         data: { title: task.title },
+        withCredentials: true,
+      }),
+    {
+      onSuccess: () => {},
+      onError: (err: any) => {
+        if (err.response.data.message) {
+          switchErrorHandling(err.response.data.message);
+        } else {
+          switchErrorHandling(err.response.data);
+        }
+      },
+    }
+  );
+  const updateTaskDetailMutation = useMutation(
+    (taskDetail: TaskDetail) =>
+      axios({
+        method: "post",
+        url: `${import.meta.env.VITE_BACKEND_URL}/task/${
+          taskDetail.task_id
+        }/update_task_detail`,
+        data: {
+          id: taskDetail.id,
+          detail: taskDetail.detail,
+          task_id: taskDetail.task_id,
+        },
         withCredentials: true,
       }),
     {
@@ -85,6 +110,7 @@ export const useMutateTask = () => {
   return {
     createTaskMutation,
     updateTaskMutation,
+    updateTaskDetailMutation,
     updateTasksMutation,
     deleteTaskListMutation,
   };
