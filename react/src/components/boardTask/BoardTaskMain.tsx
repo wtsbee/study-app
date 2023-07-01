@@ -25,6 +25,7 @@ const MarkdownMain = () => {
       ...(taskDetail as TaskDetail),
       detail: e.target.value,
     });
+    socketRef.current?.send(JSON.stringify(e.target.value));
   };
 
   useEffect(() => {
@@ -37,6 +38,34 @@ const MarkdownMain = () => {
       }
     }
   }, [taskDetail]);
+
+  useEffect(() => {
+    socketRef.current = new WebSocket(
+      `${import.meta.env.VITE_BACKEND_WEBSOCKET_URL}/task/${taskId}/ws`
+    );
+
+    socketRef.current.onopen = () => {
+      console.log("ws接続");
+    };
+
+    socketRef.current.onclose = () => {
+      console.log("ws切断");
+    };
+
+    // メッセージ受信時の処理
+    socketRef.current.onmessage = (event) => {
+      console.log("ws受信");
+      setText(JSON.parse(event.data));
+    };
+
+    // コンポーネントのアンマウント時にWebSocket接続をクローズ
+    return () => {
+      if (socketRef.current === null) {
+        return;
+      }
+      socketRef.current?.close();
+    };
+  }, []);
 
   return (
     <>
