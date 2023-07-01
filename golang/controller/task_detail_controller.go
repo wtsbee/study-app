@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -8,6 +9,7 @@ import (
 	"study-app-api/usecase"
 
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
 )
 
@@ -15,11 +17,21 @@ import (
 type ITaskDetailController interface {
 	GetTaskDetail(c echo.Context) error
 	UpdateTaskDetail(c echo.Context) error
+	WebSocketHandlerForTaskDetail(c echo.Context) error
 }
 
 type taskDetailController struct {
 	tdu usecase.ITaskDetailUsecase
 }
+
+var (
+	upgraderForTaskDetail = websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+	clientsForTaskDetail = make(map[*websocket.Conn]bool)
+)
 
 // コンストラクタ
 func NewTaskDetailController(tdu usecase.ITaskDetailUsecase) ITaskDetailController {
@@ -62,5 +74,37 @@ func (tdc *taskDetailController) UpdateTaskDetail(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
 	log.Println("controller UpdateTaskDetail : タスク詳細更新成功")
+	return nil
+}
+
+func (tdc *taskDetailController) WebSocketHandlerForTaskDetail(c echo.Context) error {
+	conn, err := upgraderForTaskDetail.Upgrade(c.Response(), c.Request(), nil)
+	if err != nil {
+		log.Println("WebSocketHandlerForTaskDetail Upgrade error:", err)
+		return err
+	}
+	defer conn.Close()
+
+	clientsForTaskDetail[conn] = true
+
+	for {
+		// クライアントからメッセージを受信
+		messageType, message, err := conn.ReadMessage()
+		if err != nil {
+			log.Println("WebSocketHandlerForTaskDetail Read error:", err)
+			break
+		}
+		fmt.Println("message: ", message)
+
+		// 受信したメッセージを全てのクライアントに送信
+		for client := range clientsForTaskDetail {
+			err = client.WriteMessage(messageType, message)
+			if err != nil {
+				log.Println("WebSocketHandlerForTaskDetail Write error:", err)
+				client.Close()
+				delete(clientsForTaskDetail, client)
+			}
+		}
+	}
 	return nil
 }
