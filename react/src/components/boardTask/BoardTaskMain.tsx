@@ -15,8 +15,9 @@ const html = markdownString.replace(/\n/g, "<br>");
 const MarkdownMain = () => {
   const [text, setText] = useState(markdownString);
   const taskId = location.pathname.split("/")[2];
-  const { data: taskDetail } = useQueryTaskDetailByTaskId(taskId);
-  const { updateTaskDetailMutation } = useMutateTask();
+  const { data: taskDetail, refetch } = useQueryTaskDetailByTaskId(taskId);
+  const { createTaskDetailMutation, updateTaskDetailMutation } =
+    useMutateTask();
   const socketRef = useRef<WebSocket>();
 
   const inputText = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -31,7 +32,10 @@ const MarkdownMain = () => {
   useEffect(() => {
     if (taskDetail) {
       if (taskDetail == "RecordNotFound") {
-        // TODO:タスク詳細を作成する
+        (async () => {
+          await createTaskDetailMutation.mutateAsync(Number(taskId));
+          refetch();
+        })();
       } else {
         const detail = (taskDetail as TaskDetail).detail;
         setText(detail);

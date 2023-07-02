@@ -45,6 +45,24 @@ export const useMutateTask = () => {
       },
     }
   );
+  const createTaskDetailMutation = useMutation(
+    (taskId: number) =>
+      axios({
+        method: "post",
+        url: `${import.meta.env.VITE_BACKEND_URL}/task/${taskId}/detail`,
+        withCredentials: true,
+      }),
+    {
+      onSuccess: () => {},
+      onError: (err: any) => {
+        if (err.response.data.message) {
+          switchErrorHandling(err.response.data.message);
+        } else {
+          switchErrorHandling(err.response.data);
+        }
+      },
+    }
+  );
   const updateTaskDetailMutation = useMutation(
     (taskDetail: TaskDetail) =>
       axios({
@@ -110,6 +128,7 @@ export const useMutateTask = () => {
   return {
     createTaskMutation,
     updateTaskMutation,
+    createTaskDetailMutation,
     updateTaskDetailMutation,
     updateTasksMutation,
     deleteTaskListMutation,
