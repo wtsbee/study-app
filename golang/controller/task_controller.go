@@ -87,6 +87,7 @@ func (tc *taskController) CreateTask(c echo.Context) error {
 		log.Println("controller CreateTask タスク作成エラー: ", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
 	}
+	log.Println("controller CreateTask タスク作成成功")
 	return nil
 }
 

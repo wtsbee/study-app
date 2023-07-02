@@ -16,6 +16,7 @@ import (
 // インターフェース
 type ITaskDetailController interface {
 	GetTaskDetail(c echo.Context) error
+	CreateTaskDetail(c echo.Context) error
 	UpdateTaskDetail(c echo.Context) error
 	WebSocketHandlerForTaskDetail(c echo.Context) error
 }
@@ -57,6 +58,21 @@ func (tdc *taskDetailController) GetTaskDetail(c echo.Context) error {
 	log.Println("controller GetTaskDetail : タスク詳細取得成功")
 	taskDetailRes := model.TaskDetailResponse{ID: taskDetail.ID, Detail: taskDetail.Detail, TaskId: taskDetail.TaskId}
 	return c.JSON(http.StatusOK, taskDetailRes)
+}
+
+func (tdc *taskDetailController) CreateTaskDetail(c echo.Context) error {
+	fmt.Println("aaaaaaaaaa")
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	taskId, _ := strconv.Atoi(c.Param("id"))
+	err := tdc.tdu.CreateTaskDetail(uint(taskId), uint(userId.(float64)))
+	if err != nil {
+		log.Println("controller CreateTaskDetail タスク詳細作成エラー: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+	log.Println("controller CreateTaskDetail タスク詳細作成成功")
+	return nil
 }
 
 func (tdc *taskDetailController) UpdateTaskDetail(c echo.Context) error {

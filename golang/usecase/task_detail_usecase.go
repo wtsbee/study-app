@@ -8,6 +8,7 @@ import (
 // // インターフェース
 type ITaskDetailUsecase interface {
 	GetTaskDetail(taskID uint, userId uint) (model.TaskDetail, error)
+	CreateTaskDetail(taskDetailId uint, userId uint) error
 	UpdateTaskDetail(taskDetail model.TaskDetailRequest, userId uint) error
 }
 
@@ -26,6 +27,13 @@ func (tdu *taskDetailUsecase) GetTaskDetail(taskID uint, userId uint) (model.Tas
 		return model.TaskDetail{}, err
 	}
 	return taskDetail, nil
+}
+
+func (tdu *taskDetailUsecase) CreateTaskDetail(taskDetailId uint, userId uint) error {
+	if err := tdu.tdr.CreateTaskDetail(taskDetailId, userId); err != nil {
+		return err
+	}
+	return nil
 }
 
 func (tdu *taskDetailUsecase) UpdateTaskDetail(taskDetail model.TaskDetailRequest, userId uint) error {
