@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"log"
 	"study-app-api/model"
 
 	"gorm.io/gorm"
@@ -81,12 +82,23 @@ func (tr *taskRepository) UpdateOwnAllTasks(taskList *[]model.TaskListResponse, 
 }
 
 func (tr *taskRepository) DeleteTaskList(taskListId uint, userId uint) error {
-	if err := tr.db.Where("id = ? AND user_id = ?", taskListId, userId).Delete(&model.TaskList{}).Error; err != nil {
+	log.Println("repository DeleteTaskList: トランザクション開始")
+	err := tr.db.Transaction(func(tx *gorm.DB) error {
+		if err := tx.Where("id = ? AND user_id = ?", taskListId, userId).Delete(&model.TaskList{}).Error; err != nil {
+			return err
+		}
+		// 関連するTaskを削除
+		if err := tr.db.Where("task_list_id = ?", taskListId).Delete(&model.Task{}).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+
+	if err != nil {
+		log.Println("repository DeleteTaskList: トトランザクション内でエラーが発生")
 		return err
 	}
-	// 関連するTaskを削除
-	if err := tr.db.Where("task_list_id = ?", taskListId).Delete(&model.Task{}).Error; err != nil {
-		return err
-	}
+
+	log.Println("repository DeleteTaskList: トトランザクション正常終了")
 	return nil
 }
