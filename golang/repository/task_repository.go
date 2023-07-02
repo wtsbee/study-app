@@ -81,9 +81,12 @@ func (tr *taskRepository) UpdateOwnAllTasks(taskList *[]model.TaskListResponse, 
 }
 
 func (tr *taskRepository) DeleteTaskList(taskListId uint, userId uint) error {
-	result := tr.db.Where("id = ? AND user_id = ?", taskListId, userId).Delete(&model.TaskList{})
-	if result.Error != nil {
-		return result.Error
+	if err := tr.db.Where("id = ? AND user_id = ?", taskListId, userId).Delete(&model.TaskList{}).Error; err != nil {
+		return err
+	}
+	// 関連するTaskを削除
+	if err := tr.db.Where("task_list_id = ?", taskListId).Delete(&model.Task{}).Error; err != nil {
+		return err
 	}
 	return nil
 }
