@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -61,7 +60,6 @@ func (tdc *taskDetailController) GetTaskDetail(c echo.Context) error {
 }
 
 func (tdc *taskDetailController) CreateTaskDetail(c echo.Context) error {
-	fmt.Println("aaaaaaaaaa")
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(jwt.MapClaims)
 	userId := claims["user_id"]
@@ -110,7 +108,7 @@ func (tdc *taskDetailController) WebSocketHandlerForTaskDetail(c echo.Context) e
 			log.Println("WebSocketHandlerForTaskDetail Read error:", err)
 			break
 		}
-		fmt.Println("message: ", message)
+		log.Println("message: ", message)
 
 		// 受信したメッセージを全てのクライアントに送信
 		for client := range clientsForTaskDetail {

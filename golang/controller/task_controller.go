@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -158,7 +157,7 @@ func (tc *taskController) WebSocketHandler(c echo.Context) error {
 			log.Println("websocketHandler Read error:", err)
 			break
 		}
-		fmt.Println("message: ", message)
+		log.Println("message: ", message)
 
 		// 受信したメッセージを全てのクライアントに送信
 		for client := range clients {
