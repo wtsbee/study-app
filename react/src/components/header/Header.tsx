@@ -1,7 +1,9 @@
 import { useMutateAuth } from "@/hooks/useMutateAuth";
+import { useNavigate } from "react-router-dom";
 
 const Header = () => {
   const { logoutMutation } = useMutateAuth();
+  const navigate = useNavigate();
   const logout = async () => {
     await logoutMutation.mutateAsync();
   };
@@ -9,7 +11,12 @@ const Header = () => {
     <header className="bg-blue-700 z-0 w-full fixed">
       <div className="mx-4 md:mx-12 py-2 h-12 md:h-14">
         <div className="flex items-center justify-between text-white font-bold">
-          <div className="text-2xl md:text-4xl">StudyApp</div>
+          <div
+            onClick={() => navigate("/board")}
+            className="text-2xl md:text-4xl hover:cursor-pointer"
+          >
+            StudyApp
+          </div>
           <button className="flex">
             <svg
               xmlns="http://www.w3.org/2000/svg"

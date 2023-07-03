@@ -16,7 +16,7 @@ export const useMutateAuth = () => {
       }),
     {
       onSuccess: () => {
-        navigate("/home");
+        navigate("/board");
       },
       onError: (err: any) => {
         if (err.response.data.message) {
