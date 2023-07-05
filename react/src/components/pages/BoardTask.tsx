@@ -53,7 +53,29 @@ const BoardTask = () => {
     // メッセージ受信時の処理
     socketRef.current.onmessage = (event) => {
       console.log("ws受信");
-      setInput(JSON.parse(event.data)[listIndex].tasks[cardIndex].title);
+
+      const taskListArray: TaskList[] = JSON.parse(event.data);
+      const str = location.pathname;
+      const pattern = /\/board\/(\d+)/;
+      const match = str.match(pattern);
+      let taskId: number;
+      if (match && match[1]) {
+        taskId = parseInt(match[1], 10);
+      }
+
+      const taskList = taskListArray.find(
+        (obj) => obj.tasks && obj.tasks.find((task) => task.id === taskId)
+      );
+
+      let title: string = "";
+      if (taskList) {
+        const task = taskList.tasks.find((task) => task.id === taskId);
+        if (task != undefined) {
+          title = task.title;
+        }
+      }
+
+      setInput(title);
       setData(JSON.parse(event.data));
     };
 
