@@ -58,18 +58,15 @@ const BoardTask = () => {
       const str = location.pathname;
       const pattern = /\/board\/(\d+)/;
       const match = str.match(pattern);
-      let taskId: number;
-      if (match && match[1]) {
-        taskId = parseInt(match[1], 10);
-      }
 
       const taskList = taskListArray.find(
-        (obj) => obj.tasks && obj.tasks.find((task) => task.id === taskId)
+        (obj) =>
+          obj.tasks && obj.tasks.find((task) => task.id === Number(taskId))
       );
 
       let title: string = "";
       if (taskList) {
-        const task = taskList.tasks.find((task) => task.id === taskId);
+        const task = taskList.tasks.find((task) => task.id === Number(taskId));
         if (task != undefined) {
           title = task.title;
         }
@@ -114,6 +111,22 @@ const BoardTask = () => {
           setIsEdit(false);
 
           const newData = [...data];
+
+          let listIndex = 0; // カードが格納されているリストのindex
+          let cardIndex = 0; // リスト内でのカードのindex
+
+          for (let i = 0; i < newData.length; i++) {
+            if (newData[i].tasks) {
+              cardIndex = newData[i].tasks.findIndex(
+                (task) => task.id === Number(taskId)
+              );
+              if (cardIndex !== -1) {
+                listIndex = i;
+                break;
+              }
+            }
+          }
+
           newData[listIndex].tasks[cardIndex].title = input;
           updateTasksMutation.mutate(newData);
           socketRef.current?.send(JSON.stringify(newData));
