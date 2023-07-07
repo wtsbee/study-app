@@ -274,12 +274,7 @@ const Board = () => {
                                               : "1",
                                           }}
                                         >
-                                          <BoardCard
-                                            listIndex={index}
-                                            cardIndex={cardIndex}
-                                          >
-                                            {task}
-                                          </BoardCard>
+                                          <BoardCard>{task}</BoardCard>
                                         </div>
                                       )}
                                     </Draggable>

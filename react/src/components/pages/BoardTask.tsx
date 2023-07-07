@@ -22,15 +22,6 @@ const BoardTask = () => {
     setInput(e.target.value);
   };
 
-  const fetchIndex = (str: string): string => {
-    const params = new URLSearchParams(location.search);
-    const listValue = params.get(str);
-    return listValue as string;
-  };
-
-  const listIndex = Number(fetchIndex("list"));
-  const cardIndex = Number(fetchIndex("card"));
-
   useEffect(() => {
     if (task) {
       setInput(task.title);
