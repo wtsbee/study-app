@@ -7,6 +7,8 @@ import { useEffect, useRef, useState } from "react";
 import { useQueryTaskDetailByTaskId } from "@/hooks/useQueryTasks";
 import { useMutateTask } from "@/hooks/useMutateTask";
 import { TaskDetail } from "@/types";
+import { useCallback } from "react";
+import { useDropzone } from "react-dropzone";
 
 const markdownString = ``;
 
@@ -16,9 +18,13 @@ const MarkdownMain = () => {
   const [text, setText] = useState(markdownString);
   const taskId = location.pathname.split("/")[2];
   const { data: taskDetail, refetch } = useQueryTaskDetailByTaskId(taskId);
-  const { createTaskDetailMutation, updateTaskDetailMutation } =
-    useMutateTask();
+  const {
+    createTaskDetailMutation,
+    updateTaskDetailMutation,
+    uploadImageMutation,
+  } = useMutateTask();
   const socketRef = useRef<WebSocket>();
+  const [imagePath, setImagePath] = useState("");
 
   const inputText = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
@@ -28,6 +34,21 @@ const MarkdownMain = () => {
     });
     socketRef.current?.send(JSON.stringify(e.target.value));
   };
+
+  const onDrop = useCallback(async (acceptedFiles: File[]) => {
+    const formData = new FormData();
+    formData.append("image", acceptedFiles[0]);
+    const res = await uploadImageMutation.mutateAsync(formData);
+    setImagePath(res.data);
+  }, []);
+
+  const { getRootProps } = useDropzone({
+    onDrop,
+    noClick: true, // クリックによるアップロードを無効化
+    accept: {
+      "image/png": [".png", ".jpg", ".jpeg"],
+    },
+  });
 
   useEffect(() => {
     if (taskDetail) {
@@ -75,11 +96,20 @@ const MarkdownMain = () => {
     <>
       <div className="flex h-screen fixed left-0 right-0">
         <textarea
+          {...getRootProps()}
           onChange={inputText}
           value={text}
           spellCheck={false}
           className="resize-none w-1/2 px-5 pt-2 pb-10 text-white bg-light-black overflow-scroll border-none outline-none"
         ></textarea>
+        <div>
+          {imagePath && (
+            <img
+              src={`${import.meta.env.VITE_BACKEND_URL}/task/${imagePath}`}
+              alt="Uploaded"
+            />
+          )}
+        </div>
         <div className="w-1/2 px-5 pt-2 pb-10 overflow-scroll">
           <ReactMarkdown remarkPlugins={[remarkGfm, emoji]}>
             {text}

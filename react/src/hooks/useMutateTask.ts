@@ -125,6 +125,25 @@ export const useMutateTask = () => {
       },
     }
   );
+  const uploadImageMutation = useMutation(
+    (formData: FormData) =>
+      axios({
+        method: "post",
+        url: `${import.meta.env.VITE_BACKEND_URL}/task/upload`,
+        data: formData,
+        withCredentials: true,
+      }),
+    {
+      onSuccess: () => {},
+      onError: (err: any) => {
+        if (err.response.data.message) {
+          switchErrorHandling(err.response.data.message);
+        } else {
+          switchErrorHandling(err.response.data);
+        }
+      },
+    }
+  );
   return {
     createTaskMutation,
     updateTaskMutation,
@@ -132,5 +151,6 @@ export const useMutateTask = () => {
     updateTaskDetailMutation,
     updateTasksMutation,
     deleteTaskListMutation,
+    uploadImageMutation,
   };
 };
