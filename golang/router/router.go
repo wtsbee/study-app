@@ -36,6 +36,8 @@ func NewRouter(uc controller.IUserController, tc controller.ITaskController, tdc
 		SigningKey:  []byte(os.Getenv("SECRET_KEY")),
 		TokenLookup: "cookie:token",
 	}))
+	t.POST("/upload", tc.UploadImageHandler)
+	t.Static("/images", "images")
 	t.GET("/:id", tc.GetTask)
 	t.POST("", tc.CreateTask)
 	t.POST("/:id", tc.UpdateTask)

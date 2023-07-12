@@ -1,11 +1,17 @@
 package controller
 
 import (
+	"fmt"
+	"io"
 	"log"
+	"mime/multipart"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"study-app-api/model"
 	"study-app-api/usecase"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/websocket"
@@ -21,6 +27,7 @@ type ITaskController interface {
 	UpdateOwnAllTasks(c echo.Context) error
 	DeleteTaskList(c echo.Context) error
 	WebSocketHandler(c echo.Context) error
+	UploadImageHandler(c echo.Context) error
 }
 
 type taskController struct {
@@ -170,4 +177,49 @@ func (tc *taskController) WebSocketHandler(c echo.Context) error {
 		}
 	}
 	return nil
+}
+
+func (tc *taskController) UploadImageHandler(c echo.Context) error {
+	// 画像ファイルを取得する
+	file, err := c.FormFile("image")
+	if err != nil {
+		return c.String(http.StatusBadRequest, "Failed to retrieve image")
+	}
+
+	// 画像を保存する
+	savePath := SaveImage(file)
+
+	// 画像の保存先パスを返す
+	return c.String(http.StatusOK, savePath)
+}
+
+func SaveImage(fileHeader *multipart.FileHeader) string {
+	file, err := fileHeader.Open()
+	if err != nil {
+		return ""
+	}
+	defer file.Close()
+
+	// 保存先のフォルダを作成する
+	saveDir := "images" // 保存フォルダのパス
+	os.MkdirAll(saveDir, os.ModePerm)
+
+	// ファイルの保存先のパスを作成する
+	saveFilePath := filepath.Join(saveDir, fmt.Sprintf("image_%d%s", time.Now().UnixNano(), filepath.Ext(fileHeader.Filename)))
+
+	// ファイルを保存する
+	saveFile, err := os.Create(saveFilePath)
+	if err != nil {
+		// エラーハンドリング
+		return ""
+	}
+	defer saveFile.Close()
+
+	// ファイルの内容を保存する
+	_, err = io.Copy(saveFile, file)
+	if err != nil {
+		return ""
+	}
+
+	return saveFilePath
 }
