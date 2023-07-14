@@ -25,6 +25,7 @@ const MarkdownMain = () => {
   } = useMutateTask();
   const socketRef = useRef<WebSocket>();
   const [imagePath, setImagePath] = useState("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const inputText = async (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setText(e.target.value);
@@ -39,8 +40,31 @@ const MarkdownMain = () => {
     const formData = new FormData();
     formData.append("image", acceptedFiles[0]);
     const res = await uploadImageMutation.mutateAsync(formData);
+    // TODO:以下のように記述したいが、insertText内でtaskDetailがundefinedとなるためuseEffectで書いているため要改善
     setImagePath(res.data);
+    // const imgUrl = `![](${import.meta.env.VITE_BACKEND_URL}/task/${res.data})`;
+    // insertText(imgUrl);
   }, []);
+
+  const insertText = async (imgUrl: string) => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      const startPos = textarea.selectionStart;
+      const endPos = textarea.selectionEnd;
+
+      const currentValue = textarea.value;
+      const newValue =
+        currentValue.substring(0, startPos) +
+        imgUrl +
+        currentValue.substring(endPos);
+      setText(newValue);
+      await updateTaskDetailMutation.mutateAsync({
+        ...(taskDetail as TaskDetail),
+        detail: newValue,
+      });
+      socketRef.current?.send(JSON.stringify(newValue));
+    }
+  };
 
   const { getRootProps } = useDropzone({
     onDrop,
@@ -56,6 +80,15 @@ const MarkdownMain = () => {
       e.stopPropagation();
     }
   };
+
+  useEffect(() => {
+    if (imagePath != "") {
+      const imgUrl = `![](${
+        import.meta.env.VITE_BACKEND_URL
+      }/task/${imagePath})`;
+      insertText(imgUrl);
+    }
+  }, [imagePath]);
 
   useEffect(() => {
     if (taskDetail) {
@@ -108,17 +141,10 @@ const MarkdownMain = () => {
           onChange={inputText}
           value={text}
           spellCheck={false}
-          className="resize-none w-1/2 px-5 pt-2 pb-10 text-white bg-light-black overflow-scroll border-none outline-none"
+          ref={textareaRef}
+          className="resize-none w-1/2 px-5 pt-2 pb-20 text-white bg-light-black overflow-scroll border-none outline-none"
         ></textarea>
-        <div>
-          {imagePath && (
-            <img
-              src={`${import.meta.env.VITE_BACKEND_URL}/task/${imagePath}`}
-              alt="Uploaded"
-            />
-          )}
-        </div>
-        <div className="w-1/2 px-5 pt-2 pb-10 overflow-scroll">
+        <div className="w-1/2 px-5 pt-2 pb-28 overflow-scroll">
           <ReactMarkdown remarkPlugins={[remarkGfm, emoji]}>
             {text}
           </ReactMarkdown>
