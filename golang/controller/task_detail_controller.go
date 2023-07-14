@@ -30,7 +30,7 @@ var (
 			return true
 		},
 	}
-	clientsForTaskDetail = make(map[*websocket.Conn]bool)
+	clientsForTaskDetail = make(map[string]map[*websocket.Conn]bool)
 )
 
 // コンストラクタ
@@ -99,7 +99,13 @@ func (tdc *taskDetailController) WebSocketHandlerForTaskDetail(c echo.Context) e
 	}
 	defer conn.Close()
 
-	clientsForTaskDetail[conn] = true
+	taskID := c.Param("id")
+
+	// タスクIDごとのクライアントマップを初期化
+	if clientsForTaskDetail[taskID] == nil {
+		clientsForTaskDetail[taskID] = make(map[*websocket.Conn]bool)
+	}
+	clientsForTaskDetail[taskID][conn] = true
 
 	for {
 		// クライアントからメッセージを受信
@@ -110,13 +116,13 @@ func (tdc *taskDetailController) WebSocketHandlerForTaskDetail(c echo.Context) e
 		}
 		log.Println("message: ", message)
 
-		// 受信したメッセージを全てのクライアントに送信
-		for client := range clientsForTaskDetail {
+		// タスクIDに紐づく全てのクライアントに送信
+		for client := range clientsForTaskDetail[taskID] {
 			err = client.WriteMessage(messageType, message)
 			if err != nil {
 				log.Println("WebSocketHandlerForTaskDetail Write error:", err)
 				client.Close()
-				delete(clientsForTaskDetail, client)
+				delete(clientsForTaskDetail[taskID], client)
 			}
 		}
 	}
