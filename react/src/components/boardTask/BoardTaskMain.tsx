@@ -74,13 +74,6 @@ const MarkdownMain = () => {
     },
   });
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Enterキーの押下時にファイルがファイル選択が開かれないようにする
-    if (e.key === "Enter") {
-      e.stopPropagation();
-    }
-  };
-
   useEffect(() => {
     if (imagePath != "") {
       const imgUrl = `![](${
@@ -137,7 +130,6 @@ const MarkdownMain = () => {
       <div className="flex h-screen fixed left-0 right-0">
         <textarea
           {...getRootProps()}
-          onKeyDown={handleKeyDown}
           onChange={inputText}
           value={text}
           spellCheck={false}
