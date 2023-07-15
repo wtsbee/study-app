@@ -22,6 +22,35 @@ const BoardTask = () => {
     setInput(e.target.value);
   };
 
+  const handleUpdateTitle = async () => {
+    await updateTaskMutation.mutateAsync({
+      ...(task as Task),
+      title: input,
+    });
+    setIsEdit(false);
+
+    const newData = [...data];
+
+    let listIndex = 0; // カードが格納されているリストのindex
+    let cardIndex = 0; // リスト内でのカードのindex
+
+    for (let i = 0; i < newData.length; i++) {
+      if (newData[i].tasks) {
+        cardIndex = newData[i].tasks.findIndex(
+          (task) => task.id === Number(taskId)
+        );
+        if (cardIndex !== -1) {
+          listIndex = i;
+          break;
+        }
+      }
+    }
+
+    newData[listIndex].tasks[cardIndex].title = input;
+    updateTasksMutation.mutate(newData);
+    socketRef.current?.send(JSON.stringify(newData));
+  };
+
   useEffect(() => {
     if (task) {
       setInput(task.title);
@@ -95,32 +124,7 @@ const BoardTask = () => {
         //ここに外側をクリックしたときの処理
         if (isEdit) {
           console.log("外側クリック");
-          await updateTaskMutation.mutateAsync({
-            ...(task as Task),
-            title: input,
-          });
-          setIsEdit(false);
-
-          const newData = [...data];
-
-          let listIndex = 0; // カードが格納されているリストのindex
-          let cardIndex = 0; // リスト内でのカードのindex
-
-          for (let i = 0; i < newData.length; i++) {
-            if (newData[i].tasks) {
-              cardIndex = newData[i].tasks.findIndex(
-                (task) => task.id === Number(taskId)
-              );
-              if (cardIndex !== -1) {
-                listIndex = i;
-                break;
-              }
-            }
-          }
-
-          newData[listIndex].tasks[cardIndex].title = input;
-          updateTasksMutation.mutate(newData);
-          socketRef.current?.send(JSON.stringify(newData));
+          handleUpdateTitle();
         }
       } else {
         //ここに内側をクリックしたきの処理
