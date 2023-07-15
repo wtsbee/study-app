@@ -44,6 +44,11 @@ const Board = () => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.nativeEvent.isComposing || e.key !== "Enter") return;
+    addList();
+  };
+
   const deleteList = (tasklist: TaskList, index: number) => {
     const newData = [...data];
     newData.splice(index, 1);
@@ -168,6 +173,7 @@ const Board = () => {
             <div className="flex flex-col w-80">
               <input
                 onChange={inputText}
+                onKeyDown={handleKeyDown}
                 value={input}
                 placeholder="リスト名を入力してください"
                 className="mb-2 p-2 rounded border border-gray-500"

@@ -42,6 +42,11 @@ const newCard = ({ taskList }: Props) => {
     }
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.nativeEvent.isComposing || e.key !== "Enter") return;
+    addCard();
+  };
+
   return (
     <>
       {isEdit ? (
@@ -49,6 +54,7 @@ const newCard = ({ taskList }: Props) => {
           <div className="mt-2 p-5 bg-pink-300 rounded">
             <textarea
               onChange={inputText}
+              onKeyDown={handleKeyDown}
               value={input}
               placeholder="タスクを入力してください"
               className=" w-full placeholder-black bg-pink-300 outline-none"
