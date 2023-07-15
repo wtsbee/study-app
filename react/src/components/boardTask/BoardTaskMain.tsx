@@ -134,10 +134,13 @@ const MarkdownMain = () => {
           value={text}
           spellCheck={false}
           ref={textareaRef}
-          className="resize-none w-1/2 px-5 pt-2 pb-20 text-white bg-light-black overflow-scroll border-none outline-none"
+          className="resize-none w-1/2 px-5 pt-2 pb-28 text-white bg-light-black overflow-scroll border-none outline-none"
         ></textarea>
         <div className="w-1/2 px-5 pt-2 pb-28 overflow-scroll">
-          <ReactMarkdown remarkPlugins={[remarkGfm, emoji]}>
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm, emoji]}
+            className="text-black"
+          >
             {text}
           </ReactMarkdown>
         </div>
