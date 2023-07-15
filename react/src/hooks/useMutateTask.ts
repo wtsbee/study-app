@@ -45,6 +45,24 @@ export const useMutateTask = () => {
       },
     }
   );
+  const deleteTaskMutation = useMutation(
+    (id: number) =>
+      axios({
+        method: "delete",
+        url: `${import.meta.env.VITE_BACKEND_URL}/task/${id}`,
+        withCredentials: true,
+      }),
+    {
+      onSuccess: () => {},
+      onError: (err: any) => {
+        if (err.response.data.message) {
+          switchErrorHandling(err.response.data.message);
+        } else {
+          switchErrorHandling(err.response.data);
+        }
+      },
+    }
+  );
   const createTaskDetailMutation = useMutation(
     (taskId: number) =>
       axios({
@@ -147,6 +165,7 @@ export const useMutateTask = () => {
   return {
     createTaskMutation,
     updateTaskMutation,
+    deleteTaskMutation,
     createTaskDetailMutation,
     updateTaskDetailMutation,
     updateTasksMutation,

@@ -280,7 +280,14 @@ const Board = () => {
                                               : "1",
                                           }}
                                         >
-                                          <BoardCard>{task}</BoardCard>
+                                          <BoardCard
+                                            socketRef={socketRef}
+                                            taskListArray={data}
+                                            listIndex={index}
+                                            cardIndex={cardIndex}
+                                          >
+                                            {task}
+                                          </BoardCard>
                                         </div>
                                       )}
                                     </Draggable>
