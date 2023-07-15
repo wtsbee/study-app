@@ -51,6 +51,11 @@ const BoardTask = () => {
     socketRef.current?.send(JSON.stringify(newData));
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.nativeEvent.isComposing || e.key !== "Enter") return;
+    handleUpdateTitle();
+  };
+
   useEffect(() => {
     if (task) {
       setInput(task.title);
@@ -151,6 +156,7 @@ const BoardTask = () => {
       <input
         ref={insideRef}
         onChange={editTitle}
+        onKeyDown={handleKeyDown}
         value={input}
         className="w-full pt-12 md:pt-16 px-5 pb-2 border-b-2 border-black text-2xl"
       ></input>
