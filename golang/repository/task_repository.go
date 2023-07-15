@@ -14,6 +14,7 @@ type ITaskRepository interface {
 	CreateTask(task *model.Task, userId uint) error
 	UpdateTask(task *model.TaskRequest, userId uint, taskId uint) error
 	UpdateOwnAllTasks(taskList *[]model.TaskListResponse, userId uint) error
+	DeleteTask(taskId uint, userId uint) error
 	DeleteTaskList(taskListId uint, userId uint) error
 }
 
@@ -81,6 +82,14 @@ func (tr *taskRepository) UpdateOwnAllTasks(taskList *[]model.TaskListResponse, 
 	return nil
 }
 
+func (tr *taskRepository) DeleteTask(taskId uint, userId uint) error {
+	// 物理削除
+	if err := tr.db.Unscoped().Where("id = ? AND user_id = ?", taskId, userId).Delete(&model.Task{}).Error; err != nil {
+		return err
+	}
+	return nil
+}
+
 func (tr *taskRepository) DeleteTaskList(taskListId uint, userId uint) error {
 	log.Println("repository DeleteTaskList: トランザクション開始")
 	err := tr.db.Transaction(func(tx *gorm.DB) error {
@@ -95,10 +104,10 @@ func (tr *taskRepository) DeleteTaskList(taskListId uint, userId uint) error {
 	})
 
 	if err != nil {
-		log.Println("repository DeleteTaskList: トトランザクション内でエラーが発生")
+		log.Println("repository DeleteTaskList: トランザクション内でエラーが発生")
 		return err
 	}
 
-	log.Println("repository DeleteTaskList: トトランザクション正常終了")
+	log.Println("repository DeleteTaskList: トランザクション正常終了")
 	return nil
 }

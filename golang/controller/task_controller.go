@@ -25,6 +25,7 @@ type ITaskController interface {
 	CreateTask(c echo.Context) error
 	UpdateTask(c echo.Context) error
 	UpdateOwnAllTasks(c echo.Context) error
+	DeleteTask(c echo.Context) error
 	DeleteTaskList(c echo.Context) error
 	WebSocketHandler(c echo.Context) error
 	UploadImageHandler(c echo.Context) error
@@ -129,6 +130,22 @@ func (tc *taskController) UpdateOwnAllTasks(c echo.Context) error {
 	}
 	tc.tu.UpdateOwnAllTasks(taskList, uint(userId.(float64)))
 	return nil
+}
+
+func (tc *taskController) DeleteTask(c echo.Context) error {
+	user := c.Get("user").(*jwt.Token)
+	claims := user.Claims.(jwt.MapClaims)
+	userId := claims["user_id"]
+	id := c.Param("id")
+	taskId, _ := strconv.Atoi(id)
+
+	err := tc.tu.DeleteTask(uint(taskId), uint(userId.(float64)))
+	if err != nil {
+		log.Println("controller DeleteTask タスク削除エラー: ", err)
+		return c.JSON(http.StatusInternalServerError, map[string]string{"message": err.Error()})
+	}
+	log.Println("controller DeleteTask : タスク削除成功")
+	return c.NoContent(http.StatusNoContent)
 }
 
 func (tc *taskController) DeleteTaskList(c echo.Context) error {
