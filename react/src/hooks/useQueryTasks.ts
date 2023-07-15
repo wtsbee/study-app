@@ -16,7 +16,7 @@ export const useQueryTaskById = (id: string) => {
   return useQuery<Task, Error>({
     queryKey: ["task", id],
     queryFn: getTaskById,
-    staleTime: Infinity,
+    staleTime: 0,
     onError: (err: any) => {
       if (err.response.data.message) {
         switchErrorHandling(err.response.data.message);
