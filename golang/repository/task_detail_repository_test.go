@@ -8,6 +8,8 @@ import (
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+
+	"github.com/DATA-DOG/go-txdb"
 )
 
 const (
@@ -23,6 +25,8 @@ func setupTestDB() *gorm.DB {
 	PROTOCOL := fmt.Sprintf("tcp(db:%s)", testDBPort)
 	// dsn := testDBUser + ":" + testDBPassword + "@tcp(" + testDBHost + ":" + testDBPort + ")/" + testDBName + "?parseTime=true"
 	dsn := testDBUser + ":" + testDBPassword + "@" + PROTOCOL + "/" + testDBName + "?charset=utf8&parseTime=true&loc=Asia%2FTokyo"
+
+	txdb.Register("txdb", "mysql", dsn)
 	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database: " + err.Error())
