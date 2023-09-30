@@ -16,6 +16,11 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo/v4"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3/s3manager"
 )
 
 // インターフェース
@@ -213,6 +218,7 @@ func (tc *taskController) UploadImageHandler(c echo.Context) error {
 func SaveImage(fileHeader *multipart.FileHeader) string {
 	file, err := fileHeader.Open()
 	if err != nil {
+		fmt.Println("SaveImage error", err)
 		return ""
 	}
 	defer file.Close()
@@ -224,10 +230,37 @@ func SaveImage(fileHeader *multipart.FileHeader) string {
 	// ファイルの保存先のパスを作成する
 	saveFilePath := filepath.Join(saveDir, fmt.Sprintf("image_%d%s", time.Now().UnixNano(), filepath.Ext(fileHeader.Filename)))
 
+	creds := credentials.NewStaticCredentials(os.Getenv("AWS_ACCESS_KEY_ID"), os.Getenv("AWS_SECRET_ACCESS_KEY"), "") // AWSに接続
+
+	sess, err := session.NewSession(&aws.Config{
+		Credentials:      creds,
+		Region:           aws.String("ap-northeast-1"),
+		Endpoint:         aws.String(os.Getenv("S3_URL")),
+		S3ForcePathStyle: aws.Bool(true),
+	})
+	if err != nil {
+		fmt.Println("SaveImage error", err)
+		return ""
+	}
+
+	defer file.Close()
+
+	// S3に画像ファイルをアップロードします。
+	uploader := s3manager.NewUploader(sess) // S3にアップロード
+	_, err = uploader.Upload(&s3manager.UploadInput{
+		Bucket: aws.String(os.Getenv("S3_BUCKET_NAME")),
+		Key:    aws.String(saveFilePath),
+		Body:   file,
+	})
+	if err != nil {
+		fmt.Println("SaveImage error", err)
+		return ""
+	}
+
 	// ファイルを保存する
 	saveFile, err := os.Create(saveFilePath)
 	if err != nil {
-		// エラーハンドリング
+		fmt.Println("SaveImage error", err)
 		return ""
 	}
 	defer saveFile.Close()
@@ -235,6 +268,7 @@ func SaveImage(fileHeader *multipart.FileHeader) string {
 	// ファイルの内容を保存する
 	_, err = io.Copy(saveFile, file)
 	if err != nil {
+		fmt.Println("SaveImage error", err)
 		return ""
 	}
 
