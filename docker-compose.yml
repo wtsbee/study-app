@@ -41,6 +41,7 @@ services:
     environment:
       VITE_BACKEND_URL: http://localhost:8080
       VITE_BACKEND_WEBSOCKET_URL: ws://localhost:8080
+      VITE_S3_BUCKET_BURL: http://localhost:9000/study-app-local
     volumes:
       - ./react:/app
     ports:

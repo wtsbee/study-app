@@ -76,9 +76,7 @@ const MarkdownMain = () => {
 
   useEffect(() => {
     if (imagePath != "") {
-      const imgUrl = `![](${
-        import.meta.env.VITE_BACKEND_URL
-      }/task/${imagePath})`;
+      const imgUrl = `![](${import.meta.env.VITE_S3_BUCKET_BURL}/${imagePath})`;
       insertText(imgUrl);
     }
   }, [imagePath]);
