@@ -2,7 +2,6 @@ package controller
 
 import (
 	"fmt"
-	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -257,20 +256,20 @@ func SaveImage(fileHeader *multipart.FileHeader) string {
 		return ""
 	}
 
-	// ファイルを保存する
-	saveFile, err := os.Create(saveFilePath)
-	if err != nil {
-		fmt.Println("SaveImage error", err)
-		return ""
-	}
-	defer saveFile.Close()
+	// // ファイルを保存する
+	// saveFile, err := os.Create(saveFilePath)
+	// if err != nil {
+	// 	fmt.Println("SaveImage error", err)
+	// 	return ""
+	// }
+	// defer saveFile.Close()
 
-	// ファイルの内容を保存する
-	_, err = io.Copy(saveFile, file)
-	if err != nil {
-		fmt.Println("SaveImage error", err)
-		return ""
-	}
+	// // ファイルの内容を保存する
+	// _, err = io.Copy(saveFile, file)
+	// if err != nil {
+	// 	fmt.Println("SaveImage error", err)
+	// 	return ""
+	// }
 
 	return saveFilePath
 }
