@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"os"
 	"study-app-api/controller"
+	"study-app-api/logging"
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
@@ -27,33 +28,33 @@ func NewRouter(uc controller.IUserController, tc controller.ITaskController, tdc
 		// CookieSameSite: http.SameSiteDefaultMode,
 		//CookieMaxAge:   60,
 	}))
-	e.POST("/signup", uc.SignUp)
-	e.POST("/login", uc.LogIn)
-	e.POST("/logout", uc.LogOut)
-	e.GET("/csrf", uc.CsrfToken)
+	e.POST("/signup", logging.LoggingMiddleware(uc.SignUp))
+	e.POST("/login", logging.LoggingMiddleware(uc.LogIn))
+	e.POST("/logout", logging.LoggingMiddleware(uc.LogOut))
+	e.GET("/csrf", logging.LoggingMiddleware(uc.CsrfToken))
 	t := e.Group("/task")
 	t.Use(echojwt.WithConfig(echojwt.Config{
 		SigningKey:  []byte(os.Getenv("SECRET_KEY")),
 		TokenLookup: "cookie:token",
 	}))
-	t.POST("/upload", tc.UploadImageHandler)
+	t.POST("/upload", logging.LoggingMiddleware(tc.UploadImageHandler))
 	t.Static("/images", "images")
-	t.GET("/:id", tc.GetTask)
-	t.POST("", tc.CreateTask)
-	t.POST("/:id", tc.UpdateTask)
-	t.DELETE("/:id", tc.DeleteTask)
-	t.GET("/:id/detail", tdc.GetTaskDetail)
-	t.POST("/:id/detail", tdc.CreateTaskDetail)
-	t.POST("/:id/update_task_detail", tdc.UpdateTaskDetail)
-	t.GET("/:id/ws", tdc.WebSocketHandlerForTaskDetail)
+	t.GET("/:id", logging.LoggingMiddleware(tc.GetTask))
+	t.POST("", logging.LoggingMiddleware(tc.CreateTask))
+	t.POST("/:id", logging.LoggingMiddleware(tc.UpdateTask))
+	t.DELETE("/:id", logging.LoggingMiddleware(tc.DeleteTask))
+	t.GET("/:id/detail", logging.LoggingMiddleware(tdc.GetTaskDetail))
+	t.POST("/:id/detail", logging.LoggingMiddleware(tdc.CreateTaskDetail))
+	t.POST("/:id/update_task_detail", logging.LoggingMiddleware(tdc.UpdateTaskDetail))
+	t.GET("/:id/ws", logging.LoggingMiddleware(tdc.WebSocketHandlerForTaskDetail))
 	ts := e.Group("/tasks")
-	ts.GET("/ws", tc.WebSocketHandler)
+	ts.GET("/ws", logging.LoggingMiddleware(tc.WebSocketHandler))
 	ts.Use(echojwt.WithConfig(echojwt.Config{
 		SigningKey:  []byte(os.Getenv("SECRET_KEY")),
 		TokenLookup: "cookie:token",
 	}))
-	ts.GET("", tc.GetOwnAllTasks)
-	ts.POST("", tc.UpdateOwnAllTasks)
-	ts.DELETE("/:id", tc.DeleteTaskList)
+	ts.GET("", logging.LoggingMiddleware(tc.GetOwnAllTasks))
+	ts.POST("", logging.LoggingMiddleware(tc.UpdateOwnAllTasks))
+	ts.DELETE("/:id", logging.LoggingMiddleware(tc.DeleteTaskList))
 	return e
 }
