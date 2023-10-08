@@ -244,7 +244,9 @@ const Board = () => {
                                 {...provided.droppableProps}
                               >
                                 <div className="flex justify-between trello-section-title font-bold">
-                                  <span>{section.name}</span>
+                                  <span className="hover:bg-pink-200 cursor-pointer">
+                                    {section.name}
+                                  </span>
                                   <svg
                                     xmlns="http://www.w3.org/2000/svg"
                                     fill="none"

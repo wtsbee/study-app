@@ -86,7 +86,7 @@ const newCard = ({ taskList }: Props) => {
         </>
       ) : (
         <div
-          className="flex mt-2 py-2 rounded hover:bg-pink-300"
+          className="flex mt-2 py-2 rounded hover:bg-pink-300 hover:cursor-pointer"
           onClick={openCard}
         >
           <svg
