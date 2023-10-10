@@ -11,7 +11,7 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
-func NewRouter(uc controller.IUserController, tc controller.ITaskController, tdc controller.ITaskDetailController) *echo.Echo {
+func NewRouter(uc controller.IUserController, tc controller.ITaskController, tdc controller.ITaskDetailController, tlc controller.ITaskListController) *echo.Echo {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{os.Getenv("FE_URL")},
@@ -56,5 +56,11 @@ func NewRouter(uc controller.IUserController, tc controller.ITaskController, tdc
 	ts.GET("", logging.LoggingMiddleware(tc.GetOwnAllTasks))
 	ts.POST("", logging.LoggingMiddleware(tc.UpdateOwnAllTasks))
 	ts.DELETE("/:id", logging.LoggingMiddleware(tc.DeleteTaskList))
+	tl := e.Group("/task_list")
+	tl.Use(echojwt.WithConfig(echojwt.Config{
+		SigningKey:  []byte(os.Getenv("SECRET_KEY")),
+		TokenLookup: "cookie:token",
+	}))
+	tl.PUT("/:id", logging.LoggingMiddleware(tlc.UpdateTaskList))
 	return e
 }

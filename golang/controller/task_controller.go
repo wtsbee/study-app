@@ -133,6 +133,7 @@ func (tc *taskController) UpdateOwnAllTasks(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"message": err.Error()})
 	}
 	tc.tu.UpdateOwnAllTasks(taskList, uint(userId.(float64)))
+	log.Println("controller UpdateOwnAllTasks : 全タスク更新成功")
 	return nil
 }
 

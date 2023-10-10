@@ -22,3 +22,8 @@ type TaskListResponse struct {
 	Name  string         `json:"name"`
 	Tasks []TaskResponse `json:"tasks"`
 }
+
+type TaskListRequest struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+}
