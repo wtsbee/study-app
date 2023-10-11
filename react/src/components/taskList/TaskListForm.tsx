@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useMutateTask } from "@/hooks/useMutateTask";
 import { TaskList } from "@/types";
 
 interface Props {
@@ -8,12 +9,17 @@ interface Props {
 const TaskListForm = ({ section: section }: Props) => {
   const [isEditList, setIsEditList] = useState(false);
   const [input, setInput] = useState(section.name);
+  const { updateTaskListMutation } = useMutateTask();
 
   const openEditList = () => {
     setIsEditList(true);
   };
 
-  const closeEditList = () => {
+  const closeEditList = async (id: number) => {
+    await updateTaskListMutation.mutateAsync({
+      id: id,
+      name: input,
+    });
     setIsEditList(false);
   };
 
@@ -40,7 +46,7 @@ const TaskListForm = ({ section: section }: Props) => {
               strokeWidth={1.5}
               stroke="currentColor"
               className="w-6 h-6 hover:bg-pink-200 cursor-pointer rounded"
-              onClick={closeEditList}
+              onClick={() => closeEditList(section.id as number)}
             >
               <path
                 strokeLinecap="round"

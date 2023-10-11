@@ -13,6 +13,11 @@ export type TaskList = {
   tasks: Task[];
 };
 
+export type TaskListRequest = {
+  id: number;
+  name: string;
+};
+
 export type Task = {
   id: number | null;
   title: string;
