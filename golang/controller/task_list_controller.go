@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -27,11 +26,8 @@ func NewTaskListController(tlu usecase.ITaskListUsecase) ITaskListController {
 }
 
 func (tlc *taskListController) UpdateTaskList(c echo.Context) error {
-	fmt.Println("aaaaaaaaaaaaaaaaaaa")
 	user := c.Get("user").(*jwt.Token)
-	fmt.Println("bbbbbbbbbbbb")
 	claims := user.Claims.(jwt.MapClaims)
-	fmt.Println("cccccccccccccc")
 	userId := claims["user_id"]
 	id := c.Param("id")
 	taskId, _ := strconv.Atoi(id)
