@@ -73,6 +73,14 @@ const TaskListForm = ({ section, state, socketRef }: Props) => {
     };
   }, []);
 
+  const handleKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    id: number
+  ) => {
+    if (e.nativeEvent.isComposing || e.key !== "Enter") return;
+    closeEditList(id);
+  };
+
   return (
     <>
       {isEditList ? (
@@ -83,6 +91,7 @@ const TaskListForm = ({ section, state, socketRef }: Props) => {
             placeholder="リスト名を入力"
             value={input}
             onChange={inputTaskList}
+            onKeyDown={(e) => handleKeyDown(e, section.id as number)}
           />
           <button className="absolute inset-y-0 right-0 pl-4 pr-1 flex items-center">
             <svg
