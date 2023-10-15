@@ -20,6 +20,11 @@ const Board = () => {
   const [isEdit, setIsEdit] = useState(false);
   const [input, setInput] = useState("");
 
+  const taskListState = {
+    data,
+    setData,
+  };
+
   const socketRef = useRef<WebSocket>();
 
   const openList = () => {
@@ -261,7 +266,11 @@ const Board = () => {
                                     />
                                   </svg>
                                 </div>
-                                <TaskListForm section={section} />
+                                <TaskListForm
+                                  section={section}
+                                  state={taskListState}
+                                  socketRef={socketRef}
+                                />
                                 <div className="trello-section-content">
                                   {section.tasks?.map((task, cardIndex) => (
                                     <Draggable

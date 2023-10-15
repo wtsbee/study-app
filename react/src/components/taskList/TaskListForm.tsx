@@ -1,15 +1,21 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutateTask } from "@/hooks/useMutateTask";
 import { TaskList } from "@/types";
 
 interface Props {
   section: TaskList;
+  state: {
+    data: TaskList[];
+    setData: React.Dispatch<React.SetStateAction<TaskList[]>>;
+  };
+  socketRef: React.MutableRefObject<WebSocket | undefined>;
 }
 
-const TaskListForm = ({ section: section }: Props) => {
+const TaskListForm = ({ section, state, socketRef }: Props) => {
   const [isEditList, setIsEditList] = useState(false);
   const [input, setInput] = useState(section.name);
   const { updateTaskListMutation } = useMutateTask();
+  const { data, setData } = { ...state };
 
   const openEditList = () => {
     setIsEditList(true);
@@ -21,11 +27,51 @@ const TaskListForm = ({ section: section }: Props) => {
       name: input,
     });
     setIsEditList(false);
+
+    const updatedData = data.map((item) => {
+      if (item.id === id) {
+        return { ...item, name: input };
+      }
+      return item;
+    });
+    socketRef.current?.send(JSON.stringify(updatedData));
   };
 
   const inputTaskList = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
   };
+
+  useEffect(() => {
+    setInput(section.name);
+  }, [section.name]);
+
+  useEffect(() => {
+    socketRef.current = new WebSocket(
+      `${import.meta.env.VITE_BACKEND_WEBSOCKET_URL}/tasks/ws`
+    );
+
+    socketRef.current.onopen = () => {
+      console.log("ws接続");
+    };
+
+    socketRef.current.onclose = () => {
+      console.log("ws切断");
+    };
+
+    // メッセージ受信時の処理
+    socketRef.current.onmessage = (event) => {
+      console.log("ws受信");
+      setData(JSON.parse(event.data));
+    };
+
+    // コンポーネントのアンマウント時にWebSocket接続をクローズ
+    return () => {
+      if (socketRef.current === null) {
+        return;
+      }
+      socketRef.current?.close();
+    };
+  }, []);
 
   return (
     <>
